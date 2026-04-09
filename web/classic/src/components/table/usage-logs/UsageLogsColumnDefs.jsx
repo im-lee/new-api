@@ -724,7 +724,6 @@ export const getLogsColumns = ({
       title: t('输入'),
       dataIndex: 'prompt_tokens',
       render: (text, record, index) => {
-        const other = getLogOther(record.other);
         const displayPromptTokens =
           toTokenNumber(text) + getPromptCacheTotal(other);
 
