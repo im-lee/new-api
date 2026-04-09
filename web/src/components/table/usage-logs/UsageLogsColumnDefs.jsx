@@ -339,10 +339,6 @@ function toTokenNumber(value) {
   return parsed;
 }
 
-function formatTokenCount(value) {
-  return toTokenNumber(value).toLocaleString();
-}
-
 function getPromptCacheSummary(other) {
   if (!other || typeof other !== 'object') {
     return null;
@@ -758,59 +754,21 @@ export const getLogsColumns = ({
     },
     {
       key: COLUMN_KEYS.PROMPT,
-      title: (
-        <div className='flex items-center gap-1'>
-          {t('输入')}
-          <Tooltip
-            content={t(
-              '根据 Anthropic 协定，/v1/messages 的输入 tokens 仅统计非缓存输入，不包含缓存读取与缓存写入 tokens。',
-            )}
-          >
-            <IconHelpCircle className='text-gray-400 cursor-help' />
-          </Tooltip>
-        </div>
-      ),
+      title: t('输入'),
       dataIndex: 'prompt_tokens',
       render: (text, record, index) => {
         const other = getLogOther(record.other);
         const cacheSummary = getPromptCacheSummary(other);
-        const hasCacheRead = (cacheSummary?.cacheReadTokens || 0) > 0;
-        const hasCacheWrite = (cacheSummary?.cacheWriteTokens || 0) > 0;
-        let cacheText = '';
-        if (hasCacheRead && hasCacheWrite) {
-          cacheText = `${t('缓存读')} ${formatTokenCount(cacheSummary.cacheReadTokens)} · ${t('写')} ${formatTokenCount(cacheSummary.cacheWriteTokens)}`;
-        } else if (hasCacheRead) {
-          cacheText = `${t('缓存读')} ${formatTokenCount(cacheSummary.cacheReadTokens)}`;
-        } else if (hasCacheWrite) {
-          cacheText = `${t('缓存写')} ${formatTokenCount(cacheSummary.cacheWriteTokens)}`;
-        }
+        const mergedPromptTokens =
+          toTokenNumber(text) +
+          toTokenNumber(cacheSummary?.cacheReadTokens) +
+          toTokenNumber(cacheSummary?.cacheWriteTokens);
 
         return record.type === 0 ||
           record.type === 2 ||
           record.type === 5 ||
           record.type === 6 ? (
-          <div
-            style={{
-              display: 'inline-flex',
-              flexDirection: 'column',
-              alignItems: 'flex-start',
-              lineHeight: 1.2,
-            }}
-          >
-            <span>{text}</span>
-            {cacheText ? (
-              <span
-                style={{
-                  marginTop: 2,
-                  fontSize: 11,
-                  color: 'var(--semi-color-text-2)',
-                  whiteSpace: 'nowrap',
-                }}
-              >
-                {cacheText}
-              </span>
-            ) : null}
-          </div>
+          <span>{mergedPromptTokens}</span>
         ) : (
           <></>
         );
