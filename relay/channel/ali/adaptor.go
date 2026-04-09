@@ -1,6 +1,7 @@
 package ali
 
 import (
+	"bufio"
 	"bytes"
 	"errors"
 	"fmt"
@@ -262,9 +263,65 @@ func buildAliDeepseekStreamInspectionRetryError(resp *http.Response) *types.NewA
 	return types.WithOpenAIError(*oaiError, http.StatusServiceUnavailable)
 }
 
+func buildAliDeepseekStreamInspectionRetryErrorFromSSE(resp *http.Response) *types.NewAPIError {
+	if resp == nil || resp.Body == nil {
+		return nil
+	}
+
+	reader := bufio.NewReader(resp.Body)
+	var captured bytes.Buffer
+
+	for {
+		line, err := reader.ReadBytes('\n')
+		if len(line) > 0 {
+			captured.Write(line)
+		}
+		if err != nil && !errors.Is(err, io.EOF) {
+			resp.Body = io.NopCloser(io.MultiReader(bytes.NewReader(captured.Bytes()), reader))
+			return nil
+		}
+
+		trimmed := bytes.TrimSpace(line)
+		if len(trimmed) == 0 {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			continue
+		}
+		if !bytes.HasPrefix(trimmed, []byte("data:")) {
+			if errors.Is(err, io.EOF) {
+				break
+			}
+			continue
+		}
+
+		payload := strings.TrimSpace(string(trimmed[len("data:"):]))
+		if payload == "" || payload == "[DONE]" {
+			break
+		}
+
+		var simpleResponse dto.SimpleResponse
+		if unmarshalErr := common.UnmarshalJsonStr(payload, &simpleResponse); unmarshalErr != nil {
+			break
+		}
+		oaiError := simpleResponse.GetOpenAIError()
+		if oaiError != nil && fmt.Sprintf("%v", oaiError.Code) == "data_inspection_failed" {
+			resp.Body = io.NopCloser(io.MultiReader(bytes.NewReader(captured.Bytes()), reader))
+			return types.WithOpenAIError(*oaiError, http.StatusServiceUnavailable)
+		}
+		break
+	}
+
+	resp.Body = io.NopCloser(io.MultiReader(bytes.NewReader(captured.Bytes()), reader))
+	return nil
+}
+
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
 	if isAliDeepseekStreamInspectionRetryCandidate(info, resp) {
 		if retryErr := buildAliDeepseekStreamInspectionRetryError(resp); retryErr != nil {
+			return nil, retryErr
+		}
+		if retryErr := buildAliDeepseekStreamInspectionRetryErrorFromSSE(resp); retryErr != nil {
 			return nil, retryErr
 		}
 	}
