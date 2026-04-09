@@ -1,18 +1,21 @@
 package ali
 
 import (
+	"bytes"
 	"errors"
 	"fmt"
 	"io"
 	"net/http"
 	"strings"
 
+	"github.com/QuantumNous/new-api/common"
+	"github.com/QuantumNous/new-api/constant"
 	"github.com/QuantumNous/new-api/dto"
 	"github.com/QuantumNous/new-api/relay/channel"
 	"github.com/QuantumNous/new-api/relay/channel/claude"
 	"github.com/QuantumNous/new-api/relay/channel/openai"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
-	"github.com/QuantumNous/new-api/relay/constant"
+	relayconstant "github.com/QuantumNous/new-api/relay/constant"
 	"github.com/QuantumNous/new-api/service"
 	"github.com/QuantumNous/new-api/setting/model_setting"
 	"github.com/QuantumNous/new-api/types"
@@ -80,19 +83,19 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 		}
 	default:
 		switch info.RelayMode {
-		case constant.RelayModeEmbeddings:
+		case relayconstant.RelayModeEmbeddings:
 			fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/embeddings", info.ChannelBaseUrl)
-		case constant.RelayModeRerank:
+		case relayconstant.RelayModeRerank:
 			fullRequestURL = fmt.Sprintf("%s/api/v1/services/rerank/text-rerank/text-rerank", info.ChannelBaseUrl)
-		case constant.RelayModeResponses:
+		case relayconstant.RelayModeResponses:
 			fullRequestURL = fmt.Sprintf("%s/api/v2/apps/protocols/compatible-mode/v1/responses", info.ChannelBaseUrl)
-		case constant.RelayModeImagesGenerations:
+		case relayconstant.RelayModeImagesGenerations:
 			if isSyncImageModel(info.OriginModelName) {
 				fullRequestURL = fmt.Sprintf("%s/api/v1/services/aigc/multimodal-generation/generation", info.ChannelBaseUrl)
 			} else {
 				fullRequestURL = fmt.Sprintf("%s/api/v1/services/aigc/text2image/image-synthesis", info.ChannelBaseUrl)
 			}
-		case constant.RelayModeImagesEdits:
+		case relayconstant.RelayModeImagesEdits:
 			if isOldWanModel(info.OriginModelName) {
 				fullRequestURL = fmt.Sprintf("%s/api/v1/services/aigc/image2image/image-synthesis", info.ChannelBaseUrl)
 			} else if isWanModel(info.OriginModelName) {
@@ -100,7 +103,7 @@ func (a *Adaptor) GetRequestURL(info *relaycommon.RelayInfo) (string, error) {
 			} else {
 				fullRequestURL = fmt.Sprintf("%s/api/v1/services/aigc/multimodal-generation/generation", info.ChannelBaseUrl)
 			}
-		case constant.RelayModeCompletions:
+		case relayconstant.RelayModeCompletions:
 			fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/completions", info.ChannelBaseUrl)
 		default:
 			fullRequestURL = fmt.Sprintf("%s/compatible-mode/v1/chat/completions", info.ChannelBaseUrl)
@@ -119,14 +122,14 @@ func (a *Adaptor) SetupRequestHeader(c *gin.Context, req *http.Header, info *rel
 	if c.GetString("plugin") != "" {
 		req.Set("X-DashScope-Plugin", c.GetString("plugin"))
 	}
-	if info.RelayMode == constant.RelayModeImagesGenerations {
+	if info.RelayMode == relayconstant.RelayModeImagesGenerations {
 		if isSyncImageModel(info.OriginModelName) {
 
 		} else {
 			req.Set("X-DashScope-Async", "enable")
 		}
 	}
-	if info.RelayMode == constant.RelayModeImagesEdits {
+	if info.RelayMode == relayconstant.RelayModeImagesEdits {
 		if isWanModel(info.OriginModelName) {
 			req.Set("X-DashScope-Async", "enable")
 		}
@@ -159,7 +162,7 @@ func (a *Adaptor) ConvertOpenAIRequest(c *gin.Context, info *relaycommon.RelayIn
 }
 
 func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInfo, request dto.ImageRequest) (any, error) {
-	if info.RelayMode == constant.RelayModeImagesGenerations {
+	if info.RelayMode == relayconstant.RelayModeImagesGenerations {
 		if isSyncImageModel(info.OriginModelName) {
 			a.IsSyncImageModel = true
 		}
@@ -168,7 +171,7 @@ func (a *Adaptor) ConvertImageRequest(c *gin.Context, info *relaycommon.RelayInf
 			return nil, fmt.Errorf("convert image request to async ali image request failed: %w", err)
 		}
 		return aliRequest, nil
-	} else if info.RelayMode == constant.RelayModeImagesEdits {
+	} else if info.RelayMode == relayconstant.RelayModeImagesEdits {
 		if isOldWanModel(info.OriginModelName) {
 			return oaiFormEdit2WanxImageEdit(c, info, request)
 		}
@@ -219,7 +222,53 @@ func (a *Adaptor) DoRequest(c *gin.Context, info *relaycommon.RelayInfo, request
 	return channel.DoApiRequest(a, c, info, requestBody)
 }
 
+func isAliDeepseekStreamInspectionRetryCandidate(info *relaycommon.RelayInfo, resp *http.Response) bool {
+	if info == nil || resp == nil {
+		return false
+	}
+	if info.ChannelType != constant.ChannelTypeAli || !info.IsStream || resp.StatusCode != http.StatusOK {
+		return false
+	}
+	modelName := strings.ToLower(info.UpstreamModelName)
+	if modelName == "" {
+		modelName = strings.ToLower(info.OriginModelName)
+	}
+	return strings.Contains(modelName, "deepseek")
+}
+
+func buildAliDeepseekStreamInspectionRetryError(resp *http.Response) *types.NewAPIError {
+	if resp == nil || resp.Body == nil {
+		return nil
+	}
+
+	responseBody, err := io.ReadAll(resp.Body)
+	if err != nil {
+		resp.Body = io.NopCloser(bytes.NewBuffer(nil))
+		return types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
+	}
+	resp.Body = io.NopCloser(bytes.NewBuffer(responseBody))
+
+	var simpleResponse dto.SimpleResponse
+	if err = common.Unmarshal(responseBody, &simpleResponse); err != nil {
+		return nil
+	}
+	oaiError := simpleResponse.GetOpenAIError()
+	if oaiError == nil {
+		return nil
+	}
+	if fmt.Sprintf("%v", oaiError.Code) != "data_inspection_failed" {
+		return nil
+	}
+	return types.WithOpenAIError(*oaiError, http.StatusServiceUnavailable)
+}
+
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
+	if isAliDeepseekStreamInspectionRetryCandidate(info, resp) {
+		if retryErr := buildAliDeepseekStreamInspectionRetryError(resp); retryErr != nil {
+			return nil, retryErr
+		}
+	}
+
 	switch info.RelayFormat {
 	case types.RelayFormatClaude:
 		if supportsAliAnthropicMessages(info.UpstreamModelName) {
@@ -231,11 +280,11 @@ func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycom
 		return adaptor.DoResponse(c, resp, info)
 	default:
 		switch info.RelayMode {
-		case constant.RelayModeImagesGenerations:
+		case relayconstant.RelayModeImagesGenerations:
 			err, usage = aliImageHandler(a, c, resp, info)
-		case constant.RelayModeImagesEdits:
+		case relayconstant.RelayModeImagesEdits:
 			err, usage = aliImageHandler(a, c, resp, info)
-		case constant.RelayModeRerank:
+		case relayconstant.RelayModeRerank:
 			err, usage = RerankHandler(c, resp, info)
 		default:
 			adaptor := openai.Adaptor{}
