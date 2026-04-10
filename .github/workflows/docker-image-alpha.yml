@@ -20,6 +20,7 @@ jobs:
   build_amd64:
     name: Build & push amd64 to Tencent CCR
     runs-on: ubuntu-latest
+    timeout-minutes: 20
     permissions:
       contents: read
     steps:
@@ -66,7 +67,6 @@ jobs:
             ${{ env.TENCENT_REGISTRY }}/${{ env.TENCENT_NAMESPACE }}/${{ env.TENCENT_IMAGE }}:release
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
-          cache-to: type=gha,mode=max
           provenance: false
           sbom: false
 
