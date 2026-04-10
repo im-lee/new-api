@@ -332,6 +332,7 @@ function renderModelName(record, copyText, t) {
   }
 }
 
+<<<<<<< HEAD:web/classic/src/components/table/usage-logs/UsageLogsColumnDefs.jsx
 function toTokenNumber(value) {
   const parsed = Number(value);
   if (!Number.isFinite(parsed) || parsed <= 0) {
@@ -724,14 +725,21 @@ export const getLogsColumns = ({
       title: t('输入'),
       dataIndex: 'prompt_tokens',
       render: (text, record, index) => {
+<<<<<<< HEAD:web/classic/src/components/table/usage-logs/UsageLogsColumnDefs.jsx
         const displayPromptTokens =
           toTokenNumber(text) + getPromptCacheTotal(other);
 
+=======
+>>>>>>> b63dd21a (fix cached token total in usage log input column):web/src/components/table/usage-logs/UsageLogsColumnDefs.jsx
         return record.type === 0 ||
           record.type === 2 ||
           record.type === 5 ||
           record.type === 6 ? (
+<<<<<<< HEAD:web/classic/src/components/table/usage-logs/UsageLogsColumnDefs.jsx
           <span>{displayPromptTokens}</span>
+=======
+          <span>{text}</span>
+>>>>>>> b63dd21a (fix cached token total in usage log input column):web/src/components/table/usage-logs/UsageLogsColumnDefs.jsx
         ) : (
           <></>
         );
