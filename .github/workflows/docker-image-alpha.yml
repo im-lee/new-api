@@ -1,4 +1,4 @@
-name: Publish Docker image (alpha)
+name: Publish Docker image (lee)
 
 env:
   FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
@@ -9,7 +9,6 @@ env:
 on:
   push:
     branches:
-      - alpha
       - lee
   workflow_dispatch:
     inputs:
@@ -64,6 +63,7 @@ jobs:
           push: true
           tags: |
             ${{ env.TENCENT_REGISTRY }}/${{ env.TENCENT_NAMESPACE }}/${{ env.TENCENT_IMAGE }}:${{ steps.version.outputs.value }}
+            ${{ env.TENCENT_REGISTRY }}/${{ env.TENCENT_NAMESPACE }}/${{ env.TENCENT_IMAGE }}:lee
             ${{ env.TENCENT_REGISTRY }}/${{ env.TENCENT_NAMESPACE }}/${{ env.TENCENT_IMAGE }}:alpha-amd64
           labels: ${{ steps.meta.outputs.labels }}
           cache-from: type=gha
