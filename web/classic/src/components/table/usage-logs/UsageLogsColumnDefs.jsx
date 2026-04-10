@@ -332,6 +332,38 @@ function renderModelName(record, copyText, t) {
   }
 }
 
+function toTokenNumber(value) {
+  const parsed = Number(value);
+  if (!Number.isFinite(parsed) || parsed <= 0) {
+    return 0;
+  }
+  return parsed;
+}
+
+function getPromptCacheTotal(other) {
+  if (!other || typeof other !== 'object') {
+    return 0;
+  }
+
+  const isAnthropicUsage =
+    other?.claude === true || other?.usage_semantic === 'anthropic';
+  if (!isAnthropicUsage) {
+    return 0;
+  }
+
+  const cacheReadTokens = toTokenNumber(other.cache_tokens);
+  const cacheCreationTokens = toTokenNumber(other.cache_creation_tokens);
+  const cacheCreationTokens5m = toTokenNumber(other.cache_creation_tokens_5m);
+  const cacheCreationTokens1h = toTokenNumber(other.cache_creation_tokens_1h);
+  const hasSplitCacheCreation =
+    cacheCreationTokens5m > 0 || cacheCreationTokens1h > 0;
+  const cacheWriteTokens = hasSplitCacheCreation
+    ? cacheCreationTokens5m + cacheCreationTokens1h
+    : cacheCreationTokens;
+
+  return cacheReadTokens + cacheWriteTokens;
+}
+
 function normalizeDetailText(detail) {
   return String(detail || '')
     .replace(/\n\r/g, '\n')
@@ -692,11 +724,15 @@ export const getLogsColumns = ({
       title: t('输入'),
       dataIndex: 'prompt_tokens',
       render: (text, record, index) => {
+        const other = getLogOther(record.other);
+        const displayPromptTokens =
+          toTokenNumber(text) + getPromptCacheTotal(other);
+
         return record.type === 0 ||
           record.type === 2 ||
           record.type === 5 ||
           record.type === 6 ? (
-          <span>{text}</span>
+          <span>{displayPromptTokens}</span>
         ) : (
           <></>
         );
