@@ -331,40 +331,6 @@ function renderModelName(record, copyText, t) {
   }
 }
 
-function toTokenNumber(value) {
-  const parsed = Number(value);
-  if (!Number.isFinite(parsed) || parsed <= 0) {
-    return 0;
-  }
-  return parsed;
-}
-
-function getPromptCacheSummary(other) {
-  if (!other || typeof other !== 'object') {
-    return null;
-  }
-
-  const cacheReadTokens = toTokenNumber(other.cache_tokens);
-  const cacheCreationTokens = toTokenNumber(other.cache_creation_tokens);
-  const cacheCreationTokens5m = toTokenNumber(other.cache_creation_tokens_5m);
-  const cacheCreationTokens1h = toTokenNumber(other.cache_creation_tokens_1h);
-
-  const hasSplitCacheCreation =
-    cacheCreationTokens5m > 0 || cacheCreationTokens1h > 0;
-  const cacheWriteTokens = hasSplitCacheCreation
-    ? cacheCreationTokens5m + cacheCreationTokens1h
-    : cacheCreationTokens;
-
-  if (cacheReadTokens <= 0 && cacheWriteTokens <= 0) {
-    return null;
-  }
-
-  return {
-    cacheReadTokens,
-    cacheWriteTokens,
-  };
-}
-
 function normalizeDetailText(detail) {
   return String(detail || '')
     .replace(/\n\r/g, '\n')
@@ -757,18 +723,11 @@ export const getLogsColumns = ({
       title: t('输入'),
       dataIndex: 'prompt_tokens',
       render: (text, record, index) => {
-        const other = getLogOther(record.other);
-        const cacheSummary = getPromptCacheSummary(other);
-        const mergedPromptTokens =
-          toTokenNumber(text) +
-          toTokenNumber(cacheSummary?.cacheReadTokens) +
-          toTokenNumber(cacheSummary?.cacheWriteTokens);
-
         return record.type === 0 ||
           record.type === 2 ||
           record.type === 5 ||
           record.type === 6 ? (
-          <span>{mergedPromptTokens}</span>
+          <span>{text}</span>
         ) : (
           <></>
         );
