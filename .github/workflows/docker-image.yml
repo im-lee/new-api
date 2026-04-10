@@ -1,0 +1,113 @@
+name: Publish Docker image
+
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: "true"
+  TENCENT_REGISTRY: ccr.ccs.tencentyun.com
+  TENCENT_NAMESPACE: im-lee
+  TENCENT_IMAGE: new-api
+
+on:
+  push:
+    branches:
+      - dev
+      - release
+  workflow_dispatch:
+    inputs:
+      name:
+        description: "reason"
+        required: false
+
+jobs:
+  build_amd64:
+    name: Build & push amd64
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Check out
+        uses: actions/checkout@34e114876b0b11c390a56381ad16ebd13914f8d5 # v4
+        with:
+          fetch-depth: 1
+
+      - name: Resolve image target
+        id: target
+        run: |
+          SHORT_SHA="$(git rev-parse --short HEAD)"
+          REPOSITORY="${GITHUB_REPOSITORY,,}"
+          BRANCH="${GITHUB_REF_NAME}"
+
+          if [ "$BRANCH" = "release" ]; then
+            IMAGE="${{ env.TENCENT_REGISTRY }}/${{ env.TENCENT_NAMESPACE }}/${{ env.TENCENT_IMAGE }}"
+            REGISTRY="${{ env.TENCENT_REGISTRY }}"
+            LOGIN_TARGET="tencent"
+            ROLLING_TAG="release"
+          elif [ "$BRANCH" = "dev" ]; then
+            IMAGE="ghcr.io/${REPOSITORY}"
+            REGISTRY="ghcr.io"
+            LOGIN_TARGET="ghcr"
+            ROLLING_TAG="dev"
+          else
+            echo "Unsupported branch: $BRANCH"
+            exit 1
+          fi
+
+          echo "$SHORT_SHA" > VERSION
+          echo "image=$IMAGE" >> "$GITHUB_OUTPUT"
+          echo "registry=$REGISTRY" >> "$GITHUB_OUTPUT"
+          echo "login_target=$LOGIN_TARGET" >> "$GITHUB_OUTPUT"
+          echo "rolling_tag=$ROLLING_TAG" >> "$GITHUB_OUTPUT"
+          echo "sha=$SHORT_SHA" >> "$GITHUB_OUTPUT"
+          echo "VERSION=$SHORT_SHA" >> "$GITHUB_ENV"
+          echo "Publishing $IMAGE:$SHORT_SHA and $IMAGE:$ROLLING_TAG"
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@8d2750c68a42422c14e847fe6c8ac0403b4cbd6f # v3
+
+      - name: Log in to Tencent CCR
+        if: steps.target.outputs.login_target == 'tencent'
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ steps.target.outputs.registry }}
+          username: ${{ secrets.TENCENT_CCR_USERNAME }}
+          password: ${{ secrets.TENCENT_CCR_PASSWORD }}
+
+      - name: Log in to GHCR
+        if: steps.target.outputs.login_target == 'ghcr'
+        uses: docker/login-action@c94ce9fb468520275223c153574b00df6fe4bcc9 # v3
+        with:
+          registry: ${{ steps.target.outputs.registry }}
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Extract metadata
+        id: meta
+        uses: docker/metadata-action@c299e40c65443455700f0fdfc63efafe5b349051 # v5
+        with:
+          images: |
+            ${{ steps.target.outputs.image }}
+
+      - name: Build & push amd64
+        id: build
+        uses: docker/build-push-action@10e90e3645eae34f1e60eeb005ba3a3d33f178e8 # v6
+        with:
+          context: .
+          platforms: linux/amd64
+          push: true
+          tags: |
+            ${{ steps.target.outputs.image }}:${{ steps.target.outputs.sha }}
+            ${{ steps.target.outputs.image }}:${{ steps.target.outputs.rolling_tag }}
+          labels: ${{ steps.meta.outputs.labels }}
+          cache-from: type=gha
+          provenance: false
+          sbom: false
+
+      - name: Output digest
+        run: |
+          echo "### Docker Image Digest (amd64)" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.target.outputs.image }}:${{ steps.target.outputs.sha }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.target.outputs.image }}:${{ steps.target.outputs.rolling_tag }}" >> "$GITHUB_STEP_SUMMARY"
+          echo "${{ steps.build.outputs.digest }}" >> "$GITHUB_STEP_SUMMARY"
+          echo '```' >> "$GITHUB_STEP_SUMMARY"
