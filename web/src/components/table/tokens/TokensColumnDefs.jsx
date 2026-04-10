@@ -43,8 +43,6 @@ import {
 import {
   IconTreeTriangleDown,
   IconCopy,
-  IconEyeOpened,
-  IconEyeClosed,
 } from '@douyinfe/semi-icons';
 
 // progress color helper
@@ -124,7 +122,6 @@ const renderTokenKey = (
   showKeys,
   resolvedTokenKeys,
   loadingTokenKeys,
-  toggleTokenVisibility,
   copyTokenKey,
   copyTokenConnectionString,
   t,
@@ -144,24 +141,11 @@ const renderTokenKey = (
         value={displayedKey}
         size='small'
         suffix={
-          <div className='flex items-center'>
-            <Button
-              theme='borderless'
-              size='small'
-              type='tertiary'
-              icon={revealed ? <IconEyeClosed /> : <IconEyeOpened />}
-              loading={loading}
-              aria-label='toggle token visibility'
-              onClick={async (e) => {
-                e.stopPropagation();
-                await toggleTokenVisibility(record);
-              }}
-            />
-            <Dropdown
-              trigger='click'
-              position='bottomRight'
-              clickToHide
-              menu={[
+          <Dropdown
+            trigger='click'
+            position='bottomRight'
+            clickToHide
+            menu={[
                 {
                   node: 'item',
                   name: t('复制密钥'),
@@ -186,7 +170,6 @@ const renderTokenKey = (
                 }}
               />
             </Dropdown>
-          </div>
         }
       />
     </div>
