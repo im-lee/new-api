@@ -122,7 +122,6 @@ const renderTokenKey = (
   showKeys,
   resolvedTokenKeys,
   loadingTokenKeys,
-  toggleTokenVisibility,
   copyTokenKey,
   copyTokenConnectionString,
   t,
