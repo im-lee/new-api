@@ -8,7 +8,7 @@ on:
   workflow_dispatch:
     inputs:
       tag:
-        description: 'Tag name to build (e.g., v0.10.8-alpha.3)'
+        description: 'Tag name to build, for example 20260410-01'
         required: true
         type: string
 
@@ -30,10 +30,7 @@ jobs:
       tag: ${{ steps.version.outputs.tag }}
 
     permissions:
-      packages: write
       contents: read
-      id-token: write
-
     steps:
       - name: Check out
         uses: actions/checkout@v4
