@@ -281,7 +281,7 @@ func buildAliDeepseekStreamInspectionRetryErrorFromSSE(resp *http.Response) *typ
 		}
 		checkedChunks++
 		oaiError := simpleResponse.GetOpenAIError()
-		if oaiError != nil && fmt.Sprintf("%v", oaiError.Code) == "data_inspection_failed" {
+		if oaiError != nil && (oaiError.Type != "" || oaiError.Message != "" || oaiError.Code != nil) {
 			resp.Body = io.NopCloser(io.MultiReader(bytes.NewReader(captured.Bytes()), reader))
 			return types.WithOpenAIError(*oaiError, http.StatusServiceUnavailable)
 		}
