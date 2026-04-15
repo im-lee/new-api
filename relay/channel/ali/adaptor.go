@@ -237,32 +237,6 @@ func isAliDeepseekStreamInspectionRetryCandidate(info *relaycommon.RelayInfo, re
 	return strings.Contains(modelName, "deepseek")
 }
 
-func buildAliDeepseekStreamInspectionRetryError(resp *http.Response) *types.NewAPIError {
-	if resp == nil || resp.Body == nil {
-		return nil
-	}
-
-	responseBody, err := io.ReadAll(resp.Body)
-	if err != nil {
-		resp.Body = io.NopCloser(bytes.NewBuffer(nil))
-		return types.NewOpenAIError(err, types.ErrorCodeReadResponseBodyFailed, http.StatusInternalServerError)
-	}
-	resp.Body = io.NopCloser(bytes.NewBuffer(responseBody))
-
-	var simpleResponse dto.SimpleResponse
-	if err = common.Unmarshal(responseBody, &simpleResponse); err != nil {
-		return nil
-	}
-	oaiError := simpleResponse.GetOpenAIError()
-	if oaiError == nil {
-		return nil
-	}
-	if fmt.Sprintf("%v", oaiError.Code) != "data_inspection_failed" {
-		return nil
-	}
-	return types.WithOpenAIError(*oaiError, http.StatusServiceUnavailable)
-}
-
 func buildAliDeepseekStreamInspectionRetryErrorFromSSE(resp *http.Response) *types.NewAPIError {
 	if resp == nil || resp.Body == nil {
 		return nil
@@ -270,6 +244,7 @@ func buildAliDeepseekStreamInspectionRetryErrorFromSSE(resp *http.Response) *typ
 
 	reader := bufio.NewReader(resp.Body)
 	var captured bytes.Buffer
+	checkedChunks := 0
 
 	for {
 		line, err := reader.ReadBytes('\n')
@@ -304,12 +279,15 @@ func buildAliDeepseekStreamInspectionRetryErrorFromSSE(resp *http.Response) *typ
 		if unmarshalErr := common.UnmarshalJsonStr(payload, &simpleResponse); unmarshalErr != nil {
 			break
 		}
+		checkedChunks++
 		oaiError := simpleResponse.GetOpenAIError()
 		if oaiError != nil && fmt.Sprintf("%v", oaiError.Code) == "data_inspection_failed" {
 			resp.Body = io.NopCloser(io.MultiReader(bytes.NewReader(captured.Bytes()), reader))
 			return types.WithOpenAIError(*oaiError, http.StatusServiceUnavailable)
 		}
-		break
+		if checkedChunks >= 2 {
+			break
+		}
 	}
 
 	resp.Body = io.NopCloser(io.MultiReader(bytes.NewReader(captured.Bytes()), reader))
@@ -318,9 +296,6 @@ func buildAliDeepseekStreamInspectionRetryErrorFromSSE(resp *http.Response) *typ
 
 func (a *Adaptor) DoResponse(c *gin.Context, resp *http.Response, info *relaycommon.RelayInfo) (usage any, err *types.NewAPIError) {
 	if isAliDeepseekStreamInspectionRetryCandidate(info, resp) {
-		if retryErr := buildAliDeepseekStreamInspectionRetryError(resp); retryErr != nil {
-			return nil, retryErr
-		}
 		if retryErr := buildAliDeepseekStreamInspectionRetryErrorFromSSE(resp); retryErr != nil {
 			return nil, retryErr
 		}
