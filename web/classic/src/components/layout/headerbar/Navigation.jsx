@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Popover } from '@douyinfe/semi-ui';
 import SkeletonWrapper from '../components/SkeletonWrapper';
@@ -33,8 +33,6 @@ const Navigation = ({
   pricingRequireAuth,
   t,
 }) => {
-  const [contactVisible, setContactVisible] = useState(false);
-
   const renderNavLinks = () => {
     const baseClasses =
       'flex-shrink-0 flex items-center gap-1 font-semibold rounded-md transition-all duration-200 ease-in-out';
@@ -51,19 +49,12 @@ const Navigation = ({
           <Popover
             key={link.itemKey}
             position='bottom'
-<<<<<<< HEAD:web/classic/src/components/layout/headerbar/Navigation.jsx
             trigger='hover'
             content={
               <div className='p-2 text-center'>
                 <div className='mb-2 text-sm text-semi-color-text-0 whitespace-normal'>
                   {t('问题咨询请备注右上角用户名')}
                 </div>
-=======
-            trigger='custom'
-            visible={contactVisible}
-            content={
-              <div className='p-2'>
->>>>>>> af439373 (feat:增加客服入口和隐藏模型列表倍率等开关):web/src/components/layout/headerbar/Navigation.jsx
                 <img
                   src={CONTACT_QR_CODE_URL}
                   alt={link.text}
@@ -75,11 +66,6 @@ const Navigation = ({
             <button
               type='button'
               className={`${commonLinkClasses} bg-transparent border-0 cursor-pointer`}
-<<<<<<< HEAD:web/classic/src/components/layout/headerbar/Navigation.jsx
-=======
-              onMouseEnter={() => setContactVisible(true)}
-              onClick={() => setContactVisible(true)}
->>>>>>> af439373 (feat:增加客服入口和隐藏模型列表倍率等开关):web/src/components/layout/headerbar/Navigation.jsx
             >
               {linkContent}
             </button>
