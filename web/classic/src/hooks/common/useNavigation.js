@@ -64,6 +64,11 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
         itemKey: 'about',
         to: '/about',
       },
+      {
+        text: t('联系客服'),
+        itemKey: 'contact',
+        isContact: true,
+      },
     ];
 
     // 根据配置过滤导航链接
@@ -76,6 +81,9 @@ export const useNavigation = (t, docsLink, headerNavModules) => {
         return typeof modules.pricing === 'object'
           ? modules.pricing.enabled
           : modules.pricing;
+      }
+      if (link.itemKey === 'contact') {
+        return modules.about === true;
       }
       return modules[link.itemKey] === true;
     });

@@ -17,9 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React from 'react';
+import React, { useState } from 'react';
 import { Link } from 'react-router-dom';
+import { Popover } from '@douyinfe/semi-ui';
 import SkeletonWrapper from '../components/SkeletonWrapper';
+
+const CONTACT_QR_CODE_URL =
+  'https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png';
 
 const Navigation = ({
   mainNavLinks,
@@ -28,6 +32,8 @@ const Navigation = ({
   userState,
   pricingRequireAuth,
 }) => {
+  const [contactVisible, setContactVisible] = useState(false);
+
   const renderNavLinks = () => {
     const baseClasses =
       'flex-shrink-0 flex items-center gap-1 font-semibold rounded-md transition-all duration-200 ease-in-out';
@@ -38,6 +44,35 @@ const Navigation = ({
 
     return mainNavLinks.map((link) => {
       const linkContent = <span>{link.text}</span>;
+
+      if (link.isContact) {
+        return (
+          <Popover
+            key={link.itemKey}
+            position='bottom'
+            trigger='custom'
+            visible={contactVisible}
+            content={
+              <div className='p-2'>
+                <img
+                  src={CONTACT_QR_CODE_URL}
+                  alt={link.text}
+                  className='block w-40 h-40 object-contain rounded-md'
+                />
+              </div>
+            }
+          >
+            <button
+              type='button'
+              className={`${commonLinkClasses} bg-transparent border-0 cursor-pointer`}
+              onMouseEnter={() => setContactVisible(true)}
+              onClick={() => setContactVisible(true)}
+            >
+              {linkContent}
+            </button>
+          </Popover>
+        );
+      }
 
       if (link.isExternal) {
         return (
