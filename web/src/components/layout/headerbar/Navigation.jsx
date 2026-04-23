@@ -17,7 +17,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 
-import React, { useState } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Popover } from '@douyinfe/semi-ui';
 import SkeletonWrapper from '../components/SkeletonWrapper';
@@ -32,8 +32,6 @@ const Navigation = ({
   userState,
   pricingRequireAuth,
 }) => {
-  const [contactVisible, setContactVisible] = useState(false);
-
   const renderNavLinks = () => {
     const baseClasses =
       'flex-shrink-0 flex items-center gap-1 font-semibold rounded-md transition-all duration-200 ease-in-out';
@@ -50,10 +48,12 @@ const Navigation = ({
           <Popover
             key={link.itemKey}
             position='bottom'
-            trigger='custom'
-            visible={contactVisible}
+            trigger='hover'
             content={
-              <div className='p-2'>
+              <div className='p-2 text-center'>
+                <div className='mb-2 text-sm text-semi-color-text-0 whitespace-normal'>
+                  {t('问题咨询请备注右上角用户名')}
+                </div>
                 <img
                   src={CONTACT_QR_CODE_URL}
                   alt={link.text}
@@ -65,8 +65,6 @@ const Navigation = ({
             <button
               type='button'
               className={`${commonLinkClasses} bg-transparent border-0 cursor-pointer`}
-              onMouseEnter={() => setContactVisible(true)}
-              onClick={() => setContactVisible(true)}
             >
               {linkContent}
             </button>
