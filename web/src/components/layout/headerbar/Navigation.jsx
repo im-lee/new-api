@@ -31,6 +31,7 @@ const Navigation = ({
   isLoading,
   userState,
   pricingRequireAuth,
+  t,
 }) => {
   const renderNavLinks = () => {
     const baseClasses =
