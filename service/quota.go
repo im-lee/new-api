@@ -232,6 +232,8 @@ func PostWssConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, mod
 		IsStream:         relayInfo.IsStream,
 		Group:            relayInfo.UsingGroup,
 		Other:            other,
+		PromptContent:    GetLogsDetailPrompt(ctx),
+		ResponseContent:  GetLogsDetailResponse(ctx),
 	})
 }
 
@@ -337,6 +339,8 @@ func PostAudioConsumeQuota(ctx *gin.Context, relayInfo *relaycommon.RelayInfo, u
 		IsStream:         relayInfo.IsStream,
 		Group:            relayInfo.UsingGroup,
 		Other:            other,
+		PromptContent:    GetLogsDetailPrompt(ctx),
+		ResponseContent:  GetLogsDetailResponse(ctx),
 	})
 }
 

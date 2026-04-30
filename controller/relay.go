@@ -83,6 +83,8 @@ func Relay(c *gin.Context, relayFormat types.RelayFormat) {
 			return
 		}
 		defer ws.Close()
+	} else {
+		service.StartLogsDetailRecorder(c)
 	}
 
 	defer func() {

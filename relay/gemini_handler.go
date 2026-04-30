@@ -142,6 +142,9 @@ func GeminiHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *typ
 		if err != nil {
 			return types.NewErrorWithStatusCode(err, types.ErrorCodeReadRequestBodyFailed, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
 		}
+		if promptBytes, bErr := storage.Bytes(); bErr == nil {
+			service.RecordLogsDetailPrompt(c, promptBytes)
+		}
 		requestBody = common.ReaderOnly(storage)
 	} else {
 		// 使用 ConvertGeminiRequest 转换请求格式
@@ -164,6 +167,7 @@ func GeminiHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *typ
 		}
 
 		logger.LogDebug(c, "Gemini request body: "+string(jsonData))
+		service.RecordLogsDetailPrompt(c, jsonData)
 
 		requestBody = bytes.NewReader(jsonData)
 	}

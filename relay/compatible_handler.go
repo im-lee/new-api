@@ -105,6 +105,9 @@ func TextHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *types
 				println("requestBody: ", string(debugBytes))
 			}
 		}
+		if promptBytes, bErr := storage.Bytes(); bErr == nil {
+			service.RecordLogsDetailPrompt(c, promptBytes)
+		}
 		requestBody = common.ReaderOnly(storage)
 	} else {
 		convertedRequest, err := adaptor.ConvertOpenAIRequest(c, info, request)
@@ -175,6 +178,7 @@ func TextHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *types
 		}
 
 		logger.LogDebug(c, fmt.Sprintf("text request body: %s", string(jsonData)))
+		service.RecordLogsDetailPrompt(c, jsonData)
 
 		requestBody = bytes.NewBuffer(jsonData)
 	}

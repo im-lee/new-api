@@ -147,6 +147,8 @@ type RecordConsumeLogParams struct {
 	IsStream         bool                   `json:"is_stream"`
 	Group            string                 `json:"group"`
 	Other            map[string]interface{} `json:"other"`
+	PromptContent    string                 `json:"prompt_content"`
+	ResponseContent  string                 `json:"response_content"`
 }
 
 func RecordConsumeLog(c *gin.Context, userId int, params RecordConsumeLogParams) {
@@ -193,6 +195,16 @@ func RecordConsumeLog(c *gin.Context, userId int, params RecordConsumeLogParams)
 	if err != nil {
 		logger.LogError(c, "failed to record log: "+err.Error())
 	}
+	EnqueueLogsDetail(&LogsDetail{
+		RequestId:        requestId,
+		UserId:           userId,
+		ModelName:        params.ModelName,
+		PromptTokens:     params.PromptTokens,
+		CompletionTokens: params.CompletionTokens,
+		PromptContent:    params.PromptContent,
+		ResponseContent:  params.ResponseContent,
+		CreatedAt:        log.CreatedAt,
+	})
 	if common.DataExportEnabled {
 		gopool.Go(func() {
 			LogQuotaData(userId, username, params.ModelName, params.Quota, common.GetTimestamp(), params.PromptTokens+params.CompletionTokens)

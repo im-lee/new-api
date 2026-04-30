@@ -51,6 +51,9 @@ func ImageHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *type
 		if err != nil {
 			return types.NewErrorWithStatusCode(err, types.ErrorCodeReadRequestBodyFailed, http.StatusBadRequest, types.ErrOptionWithSkipRetry())
 		}
+		if promptBytes, bErr := storage.Bytes(); bErr == nil {
+			service.RecordLogsDetailPrompt(c, promptBytes)
+		}
 		requestBody = common.ReaderOnly(storage)
 	} else {
 		convertedRequest, err := adaptor.ConvertImageRequest(c, info, *request)
@@ -61,6 +64,9 @@ func ImageHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *type
 
 		switch convertedRequest.(type) {
 		case *bytes.Buffer:
+			if buffer, ok := convertedRequest.(*bytes.Buffer); ok {
+				service.RecordLogsDetailPrompt(c, buffer.Bytes())
+			}
 			requestBody = convertedRequest.(io.Reader)
 		default:
 			jsonData, err := common.Marshal(convertedRequest)
@@ -79,6 +85,7 @@ func ImageHelper(c *gin.Context, info *relaycommon.RelayInfo) (newAPIError *type
 			if common.DebugEnabled {
 				logger.LogDebug(c, fmt.Sprintf("image request body: %s", string(jsonData)))
 			}
+			service.RecordLogsDetailPrompt(c, jsonData)
 			requestBody = bytes.NewBuffer(jsonData)
 		}
 	}

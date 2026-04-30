@@ -284,6 +284,7 @@ func InitResources() error {
 	if err != nil {
 		return err
 	}
+	model.InitBackupLogDB()
 
 	// Initialize Redis
 	err = common.InitRedisClient()
