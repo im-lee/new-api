@@ -45,6 +45,17 @@ const PricingContent = ({ isMobile, sidebarProps, ...props }) => {
         />
       </div>
 
+      <div
+        className='mx-4 mt-3 rounded-lg border px-4 py-3 text-sm'
+        style={{
+          backgroundColor: '#fef3c7',
+          borderColor: '#fcd34d',
+          color: '#92400e',
+        }}
+      >
+        {props.t('如需更多模型支持请联系微信客服')}
+      </div>
+
       {/* 可滚动的内容区域 */}
       <div
         className={

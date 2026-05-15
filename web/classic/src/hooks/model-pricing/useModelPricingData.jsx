@@ -24,6 +24,24 @@ import { Modal } from '@douyinfe/semi-ui';
 import { UserContext } from '../../context/User';
 import { StatusContext } from '../../context/Status';
 
+const HIDDEN_VENDOR_NAMES = ['authropic', 'anthropic', 'openai', 'google'];
+const HIDDEN_MODEL_KEYWORDS = ['gpt', 'gemini', 'claude'];
+
+const normalizeHiddenValue = (value) => (value || '').trim().toLowerCase();
+
+const isHiddenVendorName = (vendorName) =>
+  HIDDEN_VENDOR_NAMES.includes(normalizeHiddenValue(vendorName));
+
+const containsHiddenModelKeyword = (modelName) => {
+  const normalizedModelName = normalizeHiddenValue(modelName);
+  if (!normalizedModelName) {
+    return false;
+  }
+  return HIDDEN_MODEL_KEYWORDS.some((keyword) =>
+    normalizedModelName.includes(keyword),
+  );
+};
+
 export const useModelPricingData = () => {
   const { t } = useTranslation();
   const [searchValue, setSearchValue] = useState('');
@@ -240,20 +258,29 @@ export const useModelPricingData = () => {
       auto_groups,
     } = res.data;
     if (success) {
+      const filteredVendors = Array.isArray(vendors)
+        ? vendors.filter((vendor) => !isHiddenVendorName(vendor?.name))
+        : [];
+      const filteredModels = Array.isArray(data)
+        ? data.filter(
+            (model) => !containsHiddenModelKeyword(model?.model_name),
+          )
+        : [];
+
       setGroupRatio(group_ratio);
       setUsableGroup(usable_group);
       setSelectedGroup('all');
       // 构建供应商 Map 方便查找
       const vendorMap = {};
-      if (Array.isArray(vendors)) {
-        vendors.forEach((v) => {
+      if (Array.isArray(filteredVendors)) {
+        filteredVendors.forEach((v) => {
           vendorMap[v.id] = v;
         });
       }
       setVendorsMap(vendorMap);
       setEndpointMap(supported_endpoint || {});
       setAutoGroups(auto_groups || []);
-      setModelsFormat(data, group_ratio, vendorMap);
+      setModelsFormat(filteredModels, group_ratio, vendorMap);
     } else {
       showError(message);
     }
