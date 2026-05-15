@@ -21,6 +21,30 @@ import { useQuery } from '@tanstack/react-query'
 import { useStatus } from '@/hooks/use-status'
 import { getPricing } from '../api'
 
+const HIDDEN_MODEL_KEYWORDS = ['gpt', 'gemini', 'claude'] as const
+const HIDDEN_VENDOR_NAMES = ['Anthropic', 'Authropic', 'OpenAI', 'Google'] as const
+
+function normalizeHiddenMatch(value?: string): string {
+  return value?.trim().toLowerCase() ?? ''
+}
+
+function containsHiddenModelKeyword(modelName?: string): boolean {
+  const normalizedName = normalizeHiddenMatch(modelName)
+  if (!normalizedName) return false
+  return HIDDEN_MODEL_KEYWORDS.some((keyword) =>
+    normalizedName.includes(keyword)
+  )
+}
+
+function isHiddenVendor(vendorName?: string): boolean {
+  const normalizedVendorName = normalizeHiddenMatch(vendorName)
+  if (!normalizedVendorName) return false
+  return HIDDEN_VENDOR_NAMES.some(
+    (hiddenVendor) =>
+      normalizeHiddenMatch(hiddenVendor) === normalizedVendorName
+  )
+}
+
 export function usePricingData() {
   const { status } = useStatus()
 
@@ -40,29 +64,36 @@ export function usePricingData() {
     [status?.usd_exchange_rate, priceRate]
   )
 
+  const vendors = useMemo(
+    () => (data?.vendors ?? []).filter((vendor) => !isHiddenVendor(vendor.name)),
+    [data?.vendors]
+  )
+
   const models = useMemo(() => {
     if (!data?.data || !data?.vendors) return []
 
     const vendorMap = new Map(data.vendors.map((v) => [v.id, v]))
 
-    return data.data.map((model) => {
-      const vendor = model.vendor_id
-        ? vendorMap.get(model.vendor_id)
-        : undefined
-      return {
-        ...model,
-        key: model.model_name,
-        vendor_name: vendor?.name,
-        vendor_icon: vendor?.icon,
-        vendor_description: vendor?.description,
-        group_ratio: data.group_ratio,
-      }
-    })
+    return data.data
+      .filter((model) => !containsHiddenModelKeyword(model.model_name))
+      .map((model) => {
+        const vendor = model.vendor_id
+          ? vendorMap.get(model.vendor_id)
+          : undefined
+        return {
+          ...model,
+          key: model.model_name,
+          vendor_name: vendor?.name,
+          vendor_icon: vendor?.icon,
+          vendor_description: vendor?.description,
+          group_ratio: data.group_ratio,
+        }
+      })
   }, [data])
 
   return {
     models,
-    vendors: data?.vendors ?? [],
+    vendors,
     groupRatio: data?.group_ratio ?? {},
     usableGroup: data?.usable_group ?? {},
     endpointMap: data?.supported_endpoint ?? {},
