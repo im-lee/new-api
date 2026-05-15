@@ -199,6 +199,9 @@ export function Pricing() {
               )}
               className='mx-auto mt-4 max-w-2xl sm:mt-6'
             />
+            <div className='mx-auto mt-4 max-w-4xl rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 text-sm text-amber-900 shadow-sm'>
+              {t('如需更多模型支持请联系微信客服')}
+            </div>
           </header>
 
           <div className='grid gap-4 xl:grid-cols-[330px_minmax(0,1fr)]'>
