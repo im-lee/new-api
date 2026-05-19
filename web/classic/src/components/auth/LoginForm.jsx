@@ -198,7 +198,7 @@ const LoginForm = () => {
         localStorage.setItem('user', JSON.stringify(data));
         setUserData(data);
         updateAPI();
-        navigate('/');
+        navigate('/console/chat/0');
         showSuccess('登录成功！');
         setShowWeChatLoginModal(false);
       } else {
@@ -255,7 +255,7 @@ const LoginForm = () => {
               centered: true,
             });
           }
-          navigate('/console');
+          navigate('/console/chat/0');
         } else {
           showError(message);
         }
@@ -300,7 +300,7 @@ const LoginForm = () => {
         showSuccess('登录成功！');
         setUserData(data);
         updateAPI();
-        navigate('/');
+        navigate('/console/chat/0');
       } else {
         showError(message);
       }
@@ -456,7 +456,7 @@ const LoginForm = () => {
         setUserData(finish.data);
         updateAPI();
         showSuccess('登录成功！');
-        navigate('/console');
+        navigate('/console/chat/0');
       } else {
         showError(finish.message || 'Passkey 登录失败，请重试');
       }
@@ -491,7 +491,7 @@ const LoginForm = () => {
     setUserData(data);
     updateAPI();
     showSuccess('登录成功！');
-    navigate('/console');
+    navigate('/console/chat/0');
   };
 
   // 返回登录页面
