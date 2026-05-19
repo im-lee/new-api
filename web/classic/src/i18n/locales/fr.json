@@ -3685,6 +3685,10 @@
     "查看微信二维码": "Voir le QR code WeChat",
     "扫码添加微信客服": "Scannez pour ajouter le support WeChat",
     "微信客服二维码": "QR code du support WeChat",
-    "第三方平台销售客服不受理模型支持问题。": "Le service commercial des plateformes tierces ne traite pas les demandes de prise en charge de modèles."
+    "第三方平台销售客服不受理模型支持问题。": "Le service commercial des plateformes tierces ne traite pas les demandes de prise en charge de modèles.",
+    "绑定邮箱提醒": "Rappel de liaison de l'e-mail",
+    "去绑定邮箱": "Lier l'e-mail",
+    "稍后再说": "Plus tard",
+    "为了确保您的账号资产安全，建议绑定邮箱。": "Pour assurer la sécurité des actifs de votre compte, nous vous recommandons de lier une adresse e-mail."
   }
 }

@@ -29,6 +29,7 @@ import {
   copy,
   getQuotaPerUnit,
 } from '../../helpers';
+import { quotaToDisplayAmount } from '../../helpers/quota';
 import { Modal, Toast } from '@douyinfe/semi-ui';
 import { useTranslation } from 'react-i18next';
 import { UserContext } from '../../context/User';
@@ -39,6 +40,8 @@ import InvitationCard from './InvitationCard';
 import TransferModal from './modals/TransferModal';
 import PaymentConfirmModal from './modals/PaymentConfirmModal';
 import TopupHistoryModal from './modals/TopupHistoryModal';
+
+const EMAIL_BIND_REMINDER_THRESHOLD = 100;
 
 const TopUp = () => {
   const { t } = useTranslation();
@@ -93,6 +96,7 @@ const TopUp = () => {
 
   // 账单Modal状态
   const [openHistory, setOpenHistory] = useState(false);
+  const [showEmailBindReminder, setShowEmailBindReminder] = useState(false);
 
   // 订阅相关
   const [subscriptionPlans, setSubscriptionPlans] = useState([]);
@@ -113,6 +117,16 @@ const TopUp = () => {
     enable_redemption: true,
     payment_compliance_confirmed: true,
   });
+
+  const shouldShowEmailBindReminder = (user) => {
+    const balanceAmount = quotaToDisplayAmount(user?.quota || 0);
+    const hasBoundEmail = Boolean(user?.email?.trim());
+    return (
+      Number.isFinite(balanceAmount) &&
+      balanceAmount > EMAIL_BIND_REMINDER_THRESHOLD &&
+      !hasBoundEmail
+    );
+  };
 
   const confirmPayMethods = [
     ...payMethods,
@@ -506,11 +520,14 @@ const TopUp = () => {
     window.open(data.checkout_url, '_blank');
   };
 
-  const getUserQuota = async () => {
+  const getUserQuota = async (options = {}) => {
     let res = await API.get(`/api/user/self`);
     const { success, message, data } = res.data;
     if (success) {
       userDispatch({ type: 'login', payload: data });
+      if (options.showEmailBindReminder) {
+        setShowEmailBindReminder(shouldShowEmailBindReminder(data));
+      }
     } else {
       showError(message);
     }
@@ -751,7 +768,7 @@ const TopUp = () => {
 
   useEffect(() => {
     // 始终获取最新用户数据，确保余额等统计信息准确
-    getUserQuota().then();
+    getUserQuota({ showEmailBindReminder: true }).then();
     setTransferAmount(getQuotaPerUnit());
   }, []);
 
@@ -919,6 +936,24 @@ const TopUp = () => {
         onCancel={handleHistoryCancel}
         t={t}
       />
+
+      <Modal
+        title={t('绑定邮箱提醒')}
+        visible={showEmailBindReminder}
+        onCancel={() => setShowEmailBindReminder(false)}
+        onOk={() => {
+          setShowEmailBindReminder(false);
+          window.location.href = '/console/personal';
+        }}
+        okText={t('去绑定邮箱')}
+        cancelText={t('稍后再说')}
+        size='small'
+        centered
+      >
+        <div className='py-2 leading-6 text-[14px] text-semi-color-text-0'>
+          {t('为了确保您的账号资产安全，建议绑定邮箱。')}
+        </div>
+      </Modal>
 
       {/* Creem 充值确认模态框 */}
       <Modal

@@ -3830,6 +3830,10 @@
     "查看微信二维码": "View WeChat QR code",
     "扫码添加微信客服": "Scan to add WeChat support",
     "微信客服二维码": "WeChat support QR code",
-    "第三方平台销售客服不受理模型支持问题。": "Third-party sales support does not handle model support requests."
+    "第三方平台销售客服不受理模型支持问题。": "Third-party sales support does not handle model support requests.",
+    "绑定邮箱提醒": "Bind Email Reminder",
+    "去绑定邮箱": "Bind Email Now",
+    "稍后再说": "Maybe Later",
+    "为了确保您的账号资产安全，建议绑定邮箱。": "For the security of your account assets, we recommend binding an email address."
   }
 }
