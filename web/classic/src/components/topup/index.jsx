@@ -41,7 +41,7 @@ import TransferModal from './modals/TransferModal';
 import PaymentConfirmModal from './modals/PaymentConfirmModal';
 import TopupHistoryModal from './modals/TopupHistoryModal';
 
-const EMAIL_BIND_REMINDER_THRESHOLD = 100;
+const EMAIL_BIND_REMINDER_THRESHOLD = 10;
 
 const TopUp = () => {
   const { t } = useTranslation();
