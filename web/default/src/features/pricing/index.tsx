@@ -21,6 +21,11 @@ import { useTranslation } from 'react-i18next'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card'
+import {
   LoadingSkeleton,
   EmptyState,
   SearchBar,
@@ -33,6 +38,10 @@ import {
 import { EXCLUDED_GROUPS, VIEW_MODES } from './constants'
 import { useFilters } from './hooks/use-filters'
 import { usePricingData } from './hooks/use-pricing-data'
+
+const MODEL_SUPPORT_WECHAT_ID = 'deepseek998877'
+const MODEL_SUPPORT_QR_CODE_URL =
+  'https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png'
 
 export function Pricing() {
   const { t } = useTranslation()
@@ -190,6 +199,51 @@ export function Pricing() {
                 'Discover curated AI models, compare pricing and capabilities, and choose the right model for every scenario.'
               )}
             </p>
+            <div className='mx-auto mt-5 max-w-3xl rounded-2xl border border-amber-300/70 bg-amber-50/90 p-4 text-left text-amber-950 shadow-sm backdrop-blur sm:mt-6 sm:p-5 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100'>
+              <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+                <div className='space-y-1.5'>
+                  <p className='text-sm font-semibold sm:text-[15px]'>
+                    {t('Need more model support? Contact WeChat support.')}
+                  </p>
+                  <div className='flex flex-wrap items-center gap-2 text-xs sm:text-sm'>
+                    <span className='font-medium text-amber-800 dark:text-amber-200'>
+                      {t('WeChat ID: {{wechatId}}', {
+                        wechatId: MODEL_SUPPORT_WECHAT_ID,
+                      })}
+                    </span>
+                    <HoverCard openDelay={120} closeDelay={80}>
+                      <HoverCardTrigger
+                        render={
+                          <a
+                            href={MODEL_SUPPORT_QR_CODE_URL}
+                            target='_blank'
+                            rel='noopener noreferrer'
+                            className='inline-flex items-center rounded-full border border-amber-300/80 bg-white/80 px-3 py-1 font-medium text-amber-900 transition-colors hover:bg-white dark:border-amber-300/30 dark:bg-amber-50/10 dark:text-amber-100 dark:hover:bg-amber-50/15'
+                          >
+                            {t('Hover to view the WeChat QR code')}
+                          </a>
+                        }
+                      />
+                      <HoverCardContent className='w-56 border border-amber-200 bg-white p-3 text-center shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'>
+                        <div className='mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100'>
+                          {t('Scan to add WeChat support')}
+                        </div>
+                        <img
+                          src={MODEL_SUPPORT_QR_CODE_URL}
+                          alt={t('WeChat support QR code')}
+                          className='mx-auto h-44 w-44 rounded-md object-contain'
+                        />
+                      </HoverCardContent>
+                    </HoverCard>
+                  </div>
+                </div>
+                <p className='max-w-sm text-xs leading-5 text-amber-700 sm:text-right dark:text-amber-200/90'>
+                  {t(
+                    'Third-party sales support does not handle model support requests.'
+                  )}
+                </p>
+              </div>
+            </div>
             <SearchBar
               value={searchInput}
               onChange={setSearchInput}

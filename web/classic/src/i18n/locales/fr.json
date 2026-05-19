@@ -3679,6 +3679,12 @@
     "并确认自行承担部署": "confirm that I bear legal responsibility arising from deployment",
     "运营和收费行为产生的法律责任": "operation and charging behavior",
     "，": ", ",
-    "、": ", "
+    "、": ", ",
+    "需要更多模型支持？请联系微信客服": "Besoin de plus de modèles ? Contactez le support WeChat.",
+    "微信号：{{wechatId}}": "ID WeChat : {{wechatId}}",
+    "查看微信二维码": "Voir le QR code WeChat",
+    "扫码添加微信客服": "Scannez pour ajouter le support WeChat",
+    "微信客服二维码": "QR code du support WeChat",
+    "第三方平台销售客服不受理模型支持问题。": "Le service commercial des plateformes tierces ne traite pas les demandes de prise en charge de modèles."
   }
 }

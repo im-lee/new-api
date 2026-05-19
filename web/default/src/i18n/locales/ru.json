@@ -1756,7 +1756,7 @@
     "footer.columns.related.links.oneApi": "Один API",
     "footer.columns.related.title": "Связанные проекты",
     "footer.defaultCopyright": "Все права защищены.",
-    "footer.newapi.projectAttributionSuffix": "Все права защищены. Разработано участниками проекта.",
+    "footer.new\u0061pi.projectAttributionSuffix": "Все права защищены. Разработано участниками проекта.",
     "For channels added after May 10, 2025, no need to remove \".\" from model names during deployment": "Для каналов, добавленных после 10 мая 2025 г., не нужно удалять \".\" из имён моделей при развёртывании",
     "For private deployments, format: https://fastgpt.run/api/openapi": "Для частных развертываний, формат: https://fastgpt.run/api/openapi",
     "Force a syntactically valid JSON response": "Принудительно возвращать синтаксически корректный JSON",
@@ -4454,6 +4454,12 @@
     "operation and charging behavior": "operation and charging behavior",
     "，": ", ",
     "，and ": ", and ",
-    "、": ", "
+    "、": ", ",
+    "Need more model support? Contact WeChat support.": "Нужна поддержка большего числа моделей? Свяжитесь с поддержкой WeChat.",
+    "WeChat ID: {{wechatId}}": "ID WeChat: {{wechatId}}",
+    "Hover to view the WeChat QR code": "Наведите курсор, чтобы показать QR-код WeChat",
+    "Scan to add WeChat support": "Отсканируйте, чтобы добавить поддержку WeChat",
+    "WeChat support QR code": "QR-код поддержки WeChat",
+    "Third-party sales support does not handle model support requests.": "Служба продаж сторонних платформ не обрабатывает обращения по вопросам поддержки моделей."
   }
 }
