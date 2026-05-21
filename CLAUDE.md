@@ -54,6 +54,23 @@ web/             — Frontend themes container
 
 ## Rules
 
+### Local Customizations & Upstream Merge Policy
+
+This repository carries local product customizations on top of upstream code. Preserve them when merging or rebasing from upstream.
+
+- Before merging upstream changes, read `docs/local-customizations.md`.
+- During conflict resolution, prefer compatibility: keep local product behavior unless upstream has an equivalent or safer implementation.
+- If upstream changes the same area, adapt the local customization to the new upstream structure instead of dropping it.
+- After every user-facing local customization, update `docs/local-customizations.md` with:
+  - date;
+  - affected area and files;
+  - what behavior must be preserved;
+  - upstream-merge notes and validation commands.
+- For frontend-visible changes, check both themes unless the user explicitly names only one:
+  - `web/default` (React 19, Rsbuild, Base UI, Tailwind);
+  - `web/classic` (React 18, Vite, Semi Design).
+- Frontend i18n must be updated in the matching locale system for every touched theme.
+
 ### Rule 1: JSON Package — Use `common/json.go`
 
 All JSON marshal/unmarshal operations MUST use the wrapper functions in `common/json.go`:
