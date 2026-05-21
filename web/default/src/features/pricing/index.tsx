@@ -211,7 +211,7 @@ export function Pricing() {
                         wechatId: MODEL_SUPPORT_WECHAT_ID,
                       })}
                     </span>
-                    <HoverCard openDelay={120} closeDelay={80}>
+                    <HoverCard>
                       <HoverCardTrigger
                         render={
                           <a

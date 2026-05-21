@@ -38,6 +38,11 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card'
 import { DataTableToolbar } from '@/components/data-table'
 import { LOG_TYPES } from '../constants'
 import { buildSearchParams } from '../lib/filter'
@@ -49,6 +54,8 @@ import { useUsageLogsContext } from './usage-logs-provider'
 
 const route = getRouteApi('/_authenticated/usage-logs/$section')
 const logTypeValues = ['0', '1', '2', '3', '4', '5', '6'] as const
+const WECHAT_SUPPORT_QR_CODE_URL =
+  'https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png'
 
 type LogTypeValue = (typeof logTypeValues)[number]
 
@@ -58,6 +65,46 @@ function isLogTypeValue(value: string): value is LogTypeValue {
 
 interface CommonLogsFilterBarProps<TData> {
   table: Table<TData>
+}
+
+function UsageLogsRetentionNotice() {
+  const { t } = useTranslation()
+
+  return (
+    <div className='rounded-lg border border-amber-300/70 bg-amber-50/90 px-3 py-2.5 text-sm leading-6 text-amber-950 shadow-xs dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100'>
+      <span>
+        {t(
+          'Only usage records from the last 1-2 weeks are displayed. Please keep your own full log archive. If you have other questions, please contact'
+        )}
+      </span>
+      <span>{t('Usage logs retention notice separator')}</span>
+      <HoverCard>
+        <HoverCardTrigger
+          render={
+            <a
+              href={WECHAT_SUPPORT_QR_CODE_URL}
+              target='_blank'
+              rel='noopener noreferrer'
+              className='font-semibold text-amber-900 underline decoration-amber-500/60 underline-offset-4 transition-colors hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-200'
+            >
+              {t('WeChat support')}
+            </a>
+          }
+        />
+        <HoverCardContent className='w-56 border border-amber-200 bg-white p-3 text-center shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'>
+          <div className='mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100'>
+            {t('Scan to add WeChat support')}
+          </div>
+          <img
+            src={WECHAT_SUPPORT_QR_CODE_URL}
+            alt={t('WeChat support QR code')}
+            className='mx-auto h-44 w-44 rounded-md object-contain'
+          />
+        </HoverCardContent>
+      </HoverCard>
+      <span>{t('Usage logs retention notice suffix')}</span>
+    </div>
+  )
 }
 
 export function CommonLogsFilterBar<TData>(
@@ -198,118 +245,123 @@ export function CommonLogsFilterBar<TData>(
   )
 
   return (
-    <DataTableToolbar
-      table={props.table}
-      leftActions={statsBar}
-      customSearch={
-        <CompactDateTimeRangePicker
-          start={filters.startTime}
-          end={filters.endTime}
-          onChange={({ start, end }) => {
-            handleChange('startTime', start)
-            handleChange('endTime', end)
-          }}
-          className='w-full sm:w-[340px]'
-        />
-      }
-      additionalSearch={
-        <>
-          <Input
-            placeholder={t('Model Name')}
-            value={filters.model || ''}
-            onChange={(e) => handleChange('model', e.target.value)}
-            onKeyDown={handleKeyDown}
-            className={inputClass}
-          />
-          <Input
-            placeholder={t('Group')}
-            type={sensitiveType}
-            value={filters.group || ''}
-            onChange={(e) => handleChange('group', e.target.value)}
-            onKeyDown={handleKeyDown}
-            className={inputClass}
-          />
-          <Select
-            items={[
-              { value: 'all', label: t('All Types') },
-              ...LOG_TYPES.map((type) => ({
-                value: String(type.value),
-                label: t(type.label),
-              })),
-            ]}
-            value={logType}
-            onValueChange={(value) => {
-              setLogType(value !== null && isLogTypeValue(value) ? value : '')
+    <div className='flex flex-col gap-2'>
+      {statsBar}
+      <UsageLogsRetentionNotice />
+      <DataTableToolbar
+        table={props.table}
+        customSearch={
+          <CompactDateTimeRangePicker
+            start={filters.startTime}
+            end={filters.endTime}
+            onChange={({ start, end }) => {
+              handleChange('startTime', start)
+              handleChange('endTime', end)
             }}
-          >
-            <SelectTrigger className={inputClass}>
-              <SelectValue placeholder={t('All Types')} />
-            </SelectTrigger>
-            <SelectContent alignItemWithTrigger={false}>
-              <SelectGroup>
-                <SelectItem value='all'>{t('All Types')}</SelectItem>
-                {LOG_TYPES.map((type) => (
-                  <SelectItem key={type.value} value={String(type.value)}>
-                    {t(type.label)}
-                  </SelectItem>
-                ))}
-              </SelectGroup>
-            </SelectContent>
-          </Select>
-        </>
-      }
-      expandable={
-        <>
-          <Input
-            placeholder={t('Token Name')}
-            type={sensitiveType}
-            value={filters.token || ''}
-            onChange={(e) => handleChange('token', e.target.value)}
-            onKeyDown={handleKeyDown}
-            className={inputClass}
+            className='w-full sm:w-[340px]'
           />
-          {isAdmin && (
+        }
+        additionalSearch={
+          <>
             <Input
-              placeholder={t('Username')}
+              placeholder={t('Model Name')}
+              value={filters.model || ''}
+              onChange={(e) => handleChange('model', e.target.value)}
+              onKeyDown={handleKeyDown}
+              className={inputClass}
+            />
+            <Input
+              placeholder={t('Group')}
               type={sensitiveType}
-              value={filters.username || ''}
-              onChange={(e) => handleChange('username', e.target.value)}
+              value={filters.group || ''}
+              onChange={(e) => handleChange('group', e.target.value)}
               onKeyDown={handleKeyDown}
               className={inputClass}
             />
-          )}
-          {isAdmin && (
+            <Select
+              items={[
+                { value: 'all', label: t('All Types') },
+                ...LOG_TYPES.map((type) => ({
+                  value: String(type.value),
+                  label: t(type.label),
+                })),
+              ]}
+              value={logType}
+              onValueChange={(value) => {
+                setLogType(
+                  value !== null && isLogTypeValue(value) ? value : ''
+                )
+              }}
+            >
+              <SelectTrigger className={inputClass}>
+                <SelectValue placeholder={t('All Types')} />
+              </SelectTrigger>
+              <SelectContent alignItemWithTrigger={false}>
+                <SelectGroup>
+                  <SelectItem value='all'>{t('All Types')}</SelectItem>
+                  {LOG_TYPES.map((type) => (
+                    <SelectItem key={type.value} value={String(type.value)}>
+                      {t(type.label)}
+                    </SelectItem>
+                  ))}
+                </SelectGroup>
+              </SelectContent>
+            </Select>
+          </>
+        }
+        expandable={
+          <>
             <Input
-              placeholder={t('Channel ID')}
-              value={filters.channel || ''}
-              onChange={(e) => handleChange('channel', e.target.value)}
+              placeholder={t('Token Name')}
+              type={sensitiveType}
+              value={filters.token || ''}
+              onChange={(e) => handleChange('token', e.target.value)}
               onKeyDown={handleKeyDown}
               className={inputClass}
             />
-          )}
-          <Input
-            placeholder={t('Request ID')}
-            value={filters.requestId || ''}
-            onChange={(e) => handleChange('requestId', e.target.value)}
-            onKeyDown={handleKeyDown}
-            className={inputClass}
-          />
-          <Input
-            placeholder={t('Upstream Request ID')}
-            value={filters.upstreamRequestId || ''}
-            onChange={(e) =>
-              handleChange('upstreamRequestId', e.target.value)
-            }
-            onKeyDown={handleKeyDown}
-            className={inputClass}
-          />
-        </>
-      }
-      hasExpandedActiveFilters={hasExpandedFilters}
-      hasAdditionalFilters={hasAdditionalFilters}
-      onSearch={handleApply}
-      searchLoading={fetchingLogs > 0}
-      onReset={handleReset}
-    />
+            {isAdmin && (
+              <Input
+                placeholder={t('Username')}
+                type={sensitiveType}
+                value={filters.username || ''}
+                onChange={(e) => handleChange('username', e.target.value)}
+                onKeyDown={handleKeyDown}
+                className={inputClass}
+              />
+            )}
+            {isAdmin && (
+              <Input
+                placeholder={t('Channel ID')}
+                value={filters.channel || ''}
+                onChange={(e) => handleChange('channel', e.target.value)}
+                onKeyDown={handleKeyDown}
+                className={inputClass}
+              />
+            )}
+            <Input
+              placeholder={t('Request ID')}
+              value={filters.requestId || ''}
+              onChange={(e) => handleChange('requestId', e.target.value)}
+              onKeyDown={handleKeyDown}
+              className={inputClass}
+            />
+            <Input
+              placeholder={t('Upstream Request ID')}
+              value={filters.upstreamRequestId || ''}
+              onChange={(e) =>
+                handleChange('upstreamRequestId', e.target.value)
+              }
+              onKeyDown={handleKeyDown}
+              className={inputClass}
+            />
+          </>
+        }
+        hasExpandedActiveFilters={hasExpandedFilters}
+        hasAdditionalFilters={hasAdditionalFilters}
+        onSearch={handleApply}
+        searchLoading={fetchingLogs > 0}
+        onReset={handleReset}
+      />
+    </div>
   )
 }
