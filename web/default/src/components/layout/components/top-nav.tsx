@@ -28,6 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { type TopNavLink } from '../types'
+import { CustomerServiceNavLink } from './customer-service-nav-link'
 
 type TopNavProps = React.HTMLAttributes<HTMLElement> & {
   links: TopNavLink[]
@@ -100,27 +101,54 @@ export function TopNav({ className, links, ...props }: TopNavProps) {
         )}
         {...props}
       >
-        {normalizedLinks.map(({ title, href, isActive, disabled, external }) =>
-          external ? (
-            <a
-              key={`${title}-${href}`}
-              href={href}
-              target='_blank'
-              rel='noopener noreferrer'
-              className={`hover:text-primary text-sm font-medium transition-colors ${isActive ? '' : 'text-muted-foreground'}`}
-            >
-              {title}
-            </a>
-          ) : (
-            <Link
-              key={`${title}-${href}`}
-              to={href}
-              disabled={disabled}
-              className={`hover:text-primary text-sm font-medium transition-colors ${isActive ? '' : 'text-muted-foreground'}`}
-            >
-              {title}
-            </Link>
-          )
+        {normalizedLinks.map(
+          ({
+            title,
+            href,
+            isActive,
+            disabled,
+            external,
+            isContact,
+            contactQrCodeUrl,
+          }) => {
+            const className = `hover:text-primary text-sm font-medium transition-colors ${isActive ? '' : 'text-muted-foreground'}`
+
+            if (isContact) {
+              return (
+                <CustomerServiceNavLink
+                  key={`${title}-${href}`}
+                  title={title}
+                  qrCodeUrl={contactQrCodeUrl ?? href}
+                  className={className}
+                />
+              )
+            }
+
+            if (external) {
+              return (
+                <a
+                  key={`${title}-${href}`}
+                  href={href}
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className={className}
+                >
+                  {title}
+                </a>
+              )
+            }
+
+            return (
+              <Link
+                key={`${title}-${href}`}
+                to={href}
+                disabled={disabled}
+                className={className}
+              >
+                {title}
+              </Link>
+            )
+          }
         )}
       </nav>
     </>

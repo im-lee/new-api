@@ -63,3 +63,6 @@ export const MOBILE_DRAWER_CONFIG = {
     'fixed inset-x-0 bottom-3 z-50 mx-auto w-[95%] rounded-xl border border-border bg-background p-4 shadow-lg md:hidden',
   overlayClassName: 'fixed inset-0 z-40 bg-black/50 backdrop-blur-sm',
 } as const
+
+export const CUSTOMER_SERVICE_QR_CODE_URL =
+  'https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png'

@@ -33,6 +33,7 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { defaultTopNavLinks } from '../config/top-nav.config'
 import type { TopNavLink } from '../types'
+import { CustomerServiceNavLink } from './customer-service-nav-link'
 import { HeaderLogo } from './header-logo'
 
 export interface PublicHeaderProps {
@@ -143,6 +144,24 @@ export function PublicHeader(props: PublicHeaderProps) {
             <div className='hidden items-center gap-0.5 sm:flex'>
               {links.map((link, i) => {
                 const isActive = pathname === link.href
+                const className = cn(
+                  'rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200',
+                  isActive
+                    ? 'text-foreground'
+                    : 'text-muted-foreground hover:text-foreground'
+                )
+
+                if (link.isContact) {
+                  return (
+                    <CustomerServiceNavLink
+                      key={i}
+                      title={t(link.title)}
+                      qrCodeUrl={link.contactQrCodeUrl ?? link.href}
+                      className={className}
+                    />
+                  )
+                }
+
                 if (link.external) {
                   return (
                     <a
@@ -150,7 +169,7 @@ export function PublicHeader(props: PublicHeaderProps) {
                       href={link.href}
                       target='_blank'
                       rel='noopener noreferrer'
-                      className='text-muted-foreground hover:text-foreground rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200'
+                      className={className}
                     >
                       {t(link.title)}
                     </a>
@@ -160,12 +179,7 @@ export function PublicHeader(props: PublicHeaderProps) {
                   <Link
                     key={i}
                     to={link.href}
-                    className={cn(
-                      'rounded-lg px-3 py-1.5 text-[13px] font-medium transition-colors duration-200',
-                      isActive
-                        ? 'text-foreground'
-                        : 'text-muted-foreground hover:text-foreground'
-                    )}
+                    className={className}
                   >
                     {t(link.title)}
                   </Link>
@@ -260,18 +274,40 @@ export function PublicHeader(props: PublicHeaderProps) {
           <nav className='flex flex-col gap-1'>
             {links.map((link, i) => {
               const isActive = pathname === link.href
+              const className = cn(
+                'flex items-center gap-3 py-3 text-base font-medium tracking-tight transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
+                mobileOpen
+                  ? 'translate-y-0 opacity-100'
+                  : 'translate-y-4 opacity-0',
+                isActive ? 'text-foreground' : 'text-muted-foreground'
+              )
+
+              if (link.isContact || link.external) {
+                return (
+                  <a
+                    key={i}
+                    href={link.contactQrCodeUrl ?? link.href}
+                    target='_blank'
+                    rel='noopener noreferrer'
+                    onClick={() => setMobileOpen(false)}
+                    className={className}
+                    style={{
+                      transitionDelay: mobileOpen
+                        ? `${100 + i * 50}ms`
+                        : '0ms',
+                    }}
+                  >
+                    {t(link.title)}
+                  </a>
+                )
+              }
+
               return (
                 <Link
                   key={i}
                   to={link.href}
                   onClick={() => setMobileOpen(false)}
-                  className={cn(
-                    'flex items-center gap-3 py-3 text-base font-medium tracking-tight transition-all duration-500 ease-[cubic-bezier(0.16,1,0.3,1)]',
-                    mobileOpen
-                      ? 'translate-y-0 opacity-100'
-                      : 'translate-y-4 opacity-0',
-                    isActive ? 'text-foreground' : 'text-muted-foreground'
-                  )}
+                  className={className}
                   style={{
                     transitionDelay: mobileOpen ? `${100 + i * 50}ms` : '0ms',
                   }}

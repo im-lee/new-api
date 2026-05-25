@@ -21,6 +21,7 @@ import { cn } from '@/lib/utils'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
 import { defaultTopNavLinks } from '../config/top-nav.config'
 import type { TopNavLink } from '../types'
+import { CustomerServiceNavLink } from './customer-service-nav-link'
 
 interface PublicNavigationProps {
   /**
@@ -50,6 +51,22 @@ export function PublicNavigation({
   return (
     <nav className={cn('hidden items-center gap-1 md:flex', className)}>
       {links.map((link, index) => {
+        const className = cn(
+          'text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none',
+          link.disabled && 'pointer-events-none opacity-50'
+        )
+
+        if (link.isContact) {
+          return (
+            <CustomerServiceNavLink
+              key={index}
+              title={link.title}
+              qrCodeUrl={link.contactQrCodeUrl ?? link.href}
+              className={className}
+            />
+          )
+        }
+
         // Handle external links
         if (link.external) {
           return (
@@ -58,10 +75,7 @@ export function PublicNavigation({
               href={link.href}
               target='_blank'
               rel='noopener noreferrer'
-              className={cn(
-                'text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none',
-                link.disabled && 'pointer-events-none opacity-50'
-              )}
+              className={className}
             >
               {link.title}
             </a>
@@ -72,10 +86,7 @@ export function PublicNavigation({
           <Link
             key={index}
             to={link.href}
-            className={cn(
-              'text-muted-foreground hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground inline-flex h-9 w-max items-center justify-center rounded-md bg-transparent px-4 py-2 text-sm font-medium transition-colors focus:outline-none',
-              link.disabled && 'pointer-events-none opacity-50'
-            )}
+            className={className}
           >
             {link.title}
           </Link>

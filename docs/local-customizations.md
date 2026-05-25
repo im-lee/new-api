@@ -11,6 +11,46 @@ This file records local product customizations that must be preserved when mergi
 
 ## Entries
 
+### 2026-05-25 — Default Theme Header Contact And 404 Redirect
+
+**Behavior to preserve:** The default frontend theme header navigation must include a customer-service contact entry. The entry opens the WeChat support QR code and reminds users to include the username shown in the upper-right corner when consulting support.
+
+QR code URL:
+
+`https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png`
+
+The default theme 404 page must show an auto-redirect notice with a visible countdown and redirect to `/` after 5 seconds.
+
+**Affected files:**
+
+- `web/default/src/hooks/use-top-nav-links.ts`
+- `web/default/src/components/layout/constants.ts`
+- `web/default/src/components/layout/types.ts`
+- `web/default/src/components/layout/components/customer-service-nav-link.tsx`
+- `web/default/src/components/layout/components/top-nav.tsx`
+- `web/default/src/components/layout/components/public-header.tsx`
+- `web/default/src/components/layout/components/public-navigation.tsx`
+- `web/default/src/features/errors/not-found-error.tsx`
+- `web/default/src/features/system-settings/maintenance/config.ts`
+- `web/default/src/features/system-settings/maintenance/header-navigation-section.tsx`
+- `web/default/src/i18n/locales/en.json`
+- `web/default/src/i18n/locales/fr.json`
+- `web/default/src/i18n/locales/ja.json`
+- `web/default/src/i18n/locales/ru.json`
+- `web/default/src/i18n/locales/vi.json`
+- `web/default/src/i18n/locales/zh.json`
+
+**Upstream merge notes:**
+
+- Keep `contact: true` in the default header navigation configuration so existing deployments that lack this key still show the contact entry.
+- Preserve QR hover behavior on desktop and click-through access on mobile.
+- Keep the 404 redirect delay at 5 seconds unless product requirements change.
+
+**Validation:**
+
+- `cd web/default && bun run i18n:sync`
+- `cd web/default && bun run build`
+
 ### 2026-05-21 — Usage Logs Retention Notice
 
 **Behavior to preserve:** Usage logs pages must show a yellow notice below the quota/RPM/TPM summary and above search filters:

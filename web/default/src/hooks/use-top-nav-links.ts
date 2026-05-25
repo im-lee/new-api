@@ -20,12 +20,15 @@ import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { useAuthStore } from '@/stores/auth-store'
 import { useStatus } from '@/hooks/use-status'
+import { CUSTOMER_SERVICE_QR_CODE_URL } from '@/components/layout/constants'
 
 export type TopNavLink = {
   title: string
   href: string
   disabled?: boolean
   external?: boolean
+  isContact?: boolean
+  contactQrCodeUrl?: string
 }
 
 // Default navigation configuration
@@ -36,6 +39,7 @@ const DEFAULT_HEADER_NAV_MODULES = {
   rankings: { enabled: true, requireAuth: false },
   docs: true,
   about: true,
+  contact: true,
 }
 
 function parseAccessModule(
@@ -156,6 +160,17 @@ export function useTopNavLinks(): TopNavLink[] {
   // About
   if (modules?.about !== false) {
     links.push({ title: t('About'), href: '/about' })
+  }
+
+  // Customer service contact QR code
+  if (modules?.contact !== false) {
+    links.push({
+      title: t('Contact customer service'),
+      href: CUSTOMER_SERVICE_QR_CODE_URL,
+      external: true,
+      isContact: true,
+      contactQrCodeUrl: CUSTOMER_SERVICE_QR_CODE_URL,
+    })
   }
 
   return links

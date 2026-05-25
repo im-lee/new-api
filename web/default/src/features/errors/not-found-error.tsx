@@ -16,14 +16,34 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useEffect, useState } from 'react'
 import { useNavigate, useRouter } from '@tanstack/react-router'
 import { useTranslation } from 'react-i18next'
 import { Button } from '@/components/ui/button'
+
+const HOME_REDIRECT_DELAY_SECONDS = 5
 
 export function NotFoundError() {
   const { t } = useTranslation()
   const navigate = useNavigate()
   const { history } = useRouter()
+  const [secondsLeft, setSecondsLeft] = useState(HOME_REDIRECT_DELAY_SECONDS)
+
+  useEffect(() => {
+    const intervalId = window.setInterval(() => {
+      setSecondsLeft((value) => Math.max(value - 1, 0))
+    }, 1000)
+
+    const timeoutId = window.setTimeout(() => {
+      navigate({ to: '/', replace: true })
+    }, HOME_REDIRECT_DELAY_SECONDS * 1000)
+
+    return () => {
+      window.clearInterval(intervalId)
+      window.clearTimeout(timeoutId)
+    }
+  }, [navigate])
+
   return (
     <div className='h-svh'>
       <div className='m-auto flex h-full w-full flex-col items-center justify-center gap-2'>
@@ -33,6 +53,21 @@ export function NotFoundError() {
           {t("It seems like the page you're looking for")} <br />
           {t('does not exist or might have been removed.')}
         </p>
+        <div className='mt-4 w-64 max-w-[80vw] space-y-2 text-center'>
+          <p className='text-muted-foreground text-sm'>
+            {t('Redirecting to the home page in {{seconds}}s.', {
+              seconds: secondsLeft,
+            })}
+          </p>
+          <div className='bg-muted h-1.5 overflow-hidden rounded-full'>
+            <div
+              className='bg-primary h-full rounded-full transition-[width] duration-1000 ease-linear'
+              style={{
+                width: `${(secondsLeft / HOME_REDIRECT_DELAY_SECONDS) * 100}%`,
+              }}
+            />
+          </div>
+        </div>
         <div className='mt-6 flex gap-4'>
           <Button variant='outline' onClick={() => history.go(-1)}>
             {t('Go Back')}
