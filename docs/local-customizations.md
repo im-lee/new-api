@@ -11,6 +11,36 @@ This file records local product customizations that must be preserved when mergi
 
 ## Entries
 
+### 2026-05-25 — China-Compliant Home Page Provider Display
+
+**Behavior to preserve:** The default and classic home pages must not promote overseas model/provider names such as OpenAI/GPT, Claude, Gemini, Llama, xAI/Grok, Cohere, Suno, Midjourney, or Azure AI in the public landing content. Keep home page examples neutral or focused on domestic/self-hosted providers.
+
+**Affected files:**
+
+- `web/default/src/features/home/constants.ts`
+- `web/default/src/features/home/components/sections/features.tsx`
+- `web/default/src/features/home/components/sections/how-it-works.tsx`
+- `web/default/src/features/home/components/hero-terminal-demo.tsx`
+- `web/default/src/i18n/locales/en.json`
+- `web/default/src/i18n/locales/fr.json`
+- `web/default/src/i18n/locales/ja.json`
+- `web/default/src/i18n/locales/ru.json`
+- `web/default/src/i18n/locales/vi.json`
+- `web/default/src/i18n/locales/zh.json`
+- `web/classic/src/pages/Home/index.jsx`
+
+**Upstream merge notes:**
+
+- If upstream rewrites the landing page, re-check both `web/default` and `web/classic` public home pages for overseas model/provider promotion.
+- Functional admin/channel configuration pages may still mention provider names when required for configuration; this entry covers public home page marketing/demo content.
+
+**Validation:**
+
+- `rg -n "Claude|Gemini|Llama|OpenAI|GPT|Grok|Cohere|Suno|Midjourney|AzureAI|XAI" web/default/src/features/home web/classic/src/pages/Home`
+- `cd web/default && bun run i18n:sync`
+- `cd web/default && bun run build`
+- `cd web/classic && npm run build`
+
 ### 2026-05-25 — Default Theme Header Contact And 404 Redirect
 
 **Behavior to preserve:** The default frontend theme header navigation must include a customer-service contact entry. The entry opens the WeChat support QR code and reminds users to include the username shown in the upper-right corner when consulting support.

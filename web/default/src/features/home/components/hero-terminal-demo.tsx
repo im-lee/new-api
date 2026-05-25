@@ -71,7 +71,7 @@ const ACCENT_CLASSES: Record<
 
 const API_DEMOS: ApiDemoConfig[] = [
   {
-    id: 'gpt-chat',
+    id: 'chat',
     label: 'Chat',
     method: 'POST',
     endpoint: '/v1/chat/completions',
@@ -112,45 +112,41 @@ const API_DEMOS: ApiDemoConfig[] = [
     accent: 'amber',
   },
   {
-    id: 'claude',
-    label: 'Claude',
+    id: 'embeddings',
+    label: 'Embeddings',
     method: 'POST',
-    endpoint: '/v1/messages',
-    headers: ['"x-api-key: sk-••••"', '"anthropic-version: 2023-06-01"'],
+    endpoint: '/v1/embeddings',
+    headers: ['"Authorization: Bearer sk-••••"'],
     request: [
       '"model": "your-model",',
-      '"max_tokens": 1024,',
-      '"messages": [',
-      '  { "role": "user", "content": "..." }',
-      ']',
+      '"input": "..."',
     ],
     response: [
       '{',
-      '  "content": [{ "type": "text", "text": <text> }],',
-      '  "usage": { "input_tokens": <in>, "output_tokens": <out> }',
+      '  "data": [{ "embedding": [0.01, 0.02, ...] }],',
+      '  "usage": { "total_tokens": <tokens> }',
       '}',
     ],
-    responseHighlights: ['<text>', '<in>', '<out>'],
+    responseHighlights: ['<tokens>'],
     tokens: 29,
     latency: 156,
     accent: 'blue',
   },
   {
-    id: 'gemini',
-    label: 'Gemini',
+    id: 'images',
+    label: 'Images',
     method: 'POST',
-    endpoint: '/v1beta/models/{model}:generateContent',
-    headers: ['"x-goog-api-key: sk-••••"'],
+    endpoint: '/v1/images/generations',
+    headers: ['"Authorization: Bearer sk-••••"'],
     request: [
-      '"contents": [',
-      '  { "role": "user",',
-      '    "parts": [{ "text": "..." }] }',
-      ']',
+      '"model": "your-model",',
+      '"prompt": "..."',
+      '"size": "1024x1024"',
     ],
     response: [
       '{',
-      '  "candidates": [{ "content": { "parts": [{ "text": <text> }] } }],',
-      '  "usageMetadata": { "totalTokenCount": <tokens> }',
+      '  "data": [{ "url": <text> }],',
+      '  "usage": { "total_tokens": <tokens> }',
       '}',
     ],
     responseHighlights: ['<text>', '<tokens>'],
@@ -443,10 +439,10 @@ function renderResponseLine(line: string, demo: ApiDemoConfig): ReactNode {
 
 function truncateResponse(demo: ApiDemoConfig): string {
   const map: Record<string, string> = {
-    'gpt-chat': 'Chat request routed.',
+    chat: 'Chat request routed.',
     responses: 'Response workflow ready.',
-    claude: 'Claude message routed.',
-    gemini: 'Gemini request served.',
+    embeddings: 'Embedding vector ready.',
+    images: 'Image task accepted.',
   }
   return map[demo.id] ?? '...'
 }

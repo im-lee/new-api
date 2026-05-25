@@ -893,7 +893,7 @@
     "Confirmed at {{time}} by user #{{userId}}": "Confirmed at {{time}} by user #{{userId}}",
     "Conflict": "Conflit",
     "Connect": "Connecter",
-    "Connect through OpenAI, Claude, Gemini, and other compatible API routes": "Connectez-vous via OpenAI, Claude, Gemini et d'autres routes API compatibles",
+    "Connect through configured compatible API routes": "Connectez-vous via des routes API compatibles configurées",
     "Connected to io.net service normally.": "Connexion au service io.net réussie.",
     "Connection error": "Erreur de connexion",
     "Connection failed": "Connexion échouée",

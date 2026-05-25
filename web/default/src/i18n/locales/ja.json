@@ -893,7 +893,7 @@
     "Confirmed at {{time}} by user #{{userId}}": "Confirmed at {{time}} by user #{{userId}}",
     "Conflict": "競合",
     "Connect": "接続",
-    "Connect through OpenAI, Claude, Gemini, and other compatible API routes": "OpenAI、Claude、Gemini、その他の互換APIルートから接続",
+    "Connect through configured compatible API routes": "設定済みの互換APIルートから接続",
     "Connected to io.net service normally.": "io.net サービスに正常に接続しました。",
     "Connection error": "接続エラー",
     "Connection failed": "接続に失敗しました",

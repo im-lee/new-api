@@ -893,7 +893,7 @@
     "Confirmed at {{time}} by user #{{userId}}": "Confirmed at {{time}} by user #{{userId}}",
     "Conflict": "Противоречие",
     "Connect": "Подключение",
-    "Connect through OpenAI, Claude, Gemini, and other compatible API routes": "Подключайтесь через OpenAI, Claude, Gemini и другие совместимые API-маршруты",
+    "Connect through configured compatible API routes": "Подключайтесь через настроенные совместимые API-маршруты",
     "Connected to io.net service normally.": "Соединение с сервисом io.net установлено.",
     "Connection error": "Ошибка соединения",
     "Connection failed": "Не удалось подключиться",
