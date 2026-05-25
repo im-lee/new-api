@@ -21,7 +21,7 @@ import { cn } from '@/lib/utils'
 import { useTopNavLinks } from '@/hooks/use-top-nav-links'
 import { defaultTopNavLinks } from '../config/top-nav.config'
 import type { TopNavLink } from '../types'
-import { CustomerServiceNavLink } from './customer-service-nav-link'
+import { CustomerServiceNavLink } from './nav-link-item'
 
 interface PublicNavigationProps {
   /**

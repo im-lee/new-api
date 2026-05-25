@@ -26,7 +26,7 @@ The default theme 404 page must show an auto-redirect notice with a visible coun
 - `web/default/src/hooks/use-top-nav-links.ts`
 - `web/default/src/components/layout/constants.ts`
 - `web/default/src/components/layout/types.ts`
-- `web/default/src/components/layout/components/customer-service-nav-link.tsx`
+- `web/default/src/components/layout/components/nav-link-item.tsx`
 - `web/default/src/components/layout/components/top-nav.tsx`
 - `web/default/src/components/layout/components/public-header.tsx`
 - `web/default/src/components/layout/components/public-navigation.tsx`

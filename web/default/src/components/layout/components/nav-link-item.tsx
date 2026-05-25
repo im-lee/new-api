@@ -17,12 +17,63 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
+import { useTranslation } from 'react-i18next'
 import { cn } from '@/lib/utils'
+import {
+  HoverCard,
+  HoverCardContent,
+  HoverCardTrigger,
+} from '@/components/ui/hover-card'
 import type { TopNavLink } from '../types'
 
 interface NavLinkItemProps {
   link: TopNavLink
   className?: string
+}
+
+type CustomerServiceNavLinkProps = {
+  title: string
+  qrCodeUrl: string
+  className?: string
+}
+
+export function CustomerServiceNavLink({
+  title,
+  qrCodeUrl,
+  className,
+}: CustomerServiceNavLinkProps) {
+  const { t } = useTranslation()
+
+  return (
+    <HoverCard>
+      <HoverCardTrigger
+        render={
+          <a
+            href={qrCodeUrl}
+            target='_blank'
+            rel='noopener noreferrer'
+            className={className}
+          >
+            {title}
+          </a>
+        }
+      />
+      <HoverCardContent className='w-56 p-3'>
+        <div className='space-y-2 text-center'>
+          <div className='text-sm font-medium'>
+            {t(
+              'Please include the username shown in the upper-right corner when consulting support.'
+            )}
+          </div>
+          <img
+            src={qrCodeUrl}
+            alt={t('WeChat support QR code')}
+            className='mx-auto h-40 w-40 rounded-md object-contain'
+          />
+        </div>
+      </HoverCardContent>
+    </HoverCard>
+  )
 }
 
 /**
@@ -35,6 +86,16 @@ export function NavLinkItem({ link, className }: NavLinkItemProps) {
     link.disabled && 'pointer-events-none opacity-50',
     className
   )
+
+  if (link.isContact) {
+    return (
+      <CustomerServiceNavLink
+        title={link.title}
+        qrCodeUrl={link.contactQrCodeUrl ?? link.href}
+        className={linkClassName}
+      />
+    )
+  }
 
   if (link.external) {
     return (

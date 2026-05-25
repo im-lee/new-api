@@ -28,7 +28,7 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu'
 import { type TopNavLink } from '../types'
-import { CustomerServiceNavLink } from './customer-service-nav-link'
+import { CustomerServiceNavLink } from './nav-link-item'
 
 type TopNavProps = React.HTMLAttributes<HTMLElement> & {
   links: TopNavLink[]

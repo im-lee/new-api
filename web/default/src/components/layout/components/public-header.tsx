@@ -33,8 +33,8 @@ import { ProfileDropdown } from '@/components/profile-dropdown'
 import { ThemeSwitch } from '@/components/theme-switch'
 import { defaultTopNavLinks } from '../config/top-nav.config'
 import type { TopNavLink } from '../types'
-import { CustomerServiceNavLink } from './customer-service-nav-link'
 import { HeaderLogo } from './header-logo'
+import { CustomerServiceNavLink } from './nav-link-item'
 
 export interface PublicHeaderProps {
   navLinks?: TopNavLink[]
