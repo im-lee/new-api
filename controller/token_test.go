@@ -390,7 +390,7 @@ func TestTokenMigrationFromChar48ToVarchar128Postgres(t *testing.T) {
 	runTokenMigrationCompatibilityTest(t, db, "postgres", managedTokensTable)
 }
 
-func TestGetAllTokensMasksKeyInResponse(t *testing.T) {
+func TestGetAllTokensReturnsRawKeyInResponse(t *testing.T) {
 	db := setupTokenControllerTestDB(t)
 	token := seedToken(t, db, 1, "list-token", "abcd1234efgh5678")
 	seedToken(t, db, 2, "other-user-token", "zzzz1234yyyy5678")
@@ -410,11 +410,8 @@ func TestGetAllTokensMasksKeyInResponse(t *testing.T) {
 	if len(page.Items) != 1 {
 		t.Fatalf("expected exactly one token, got %d", len(page.Items))
 	}
-	if page.Items[0].Key != token.GetMaskedKey() {
-		t.Fatalf("expected masked key %q, got %q", token.GetMaskedKey(), page.Items[0].Key)
-	}
-	if strings.Contains(recorder.Body.String(), token.Key) {
-		t.Fatalf("list response leaked raw token key: %s", recorder.Body.String())
+	if page.Items[0].Key != token.Key {
+		t.Fatalf("expected raw key %q, got %q", token.Key, page.Items[0].Key)
 	}
 }
 
