@@ -11,6 +11,52 @@ This file records local product customizations that must be preserved when mergi
 
 ## Entries
 
+### 2026-05-26 — Default Theme Quick Exchange And Hover Contact
+
+**Behavior to preserve:** The default home page must expose quick redemption and customer-service contact actions for both logged-in and logged-out users. Quick redemption posts to the local Go backend `/api/quick_exchange`, creates or reuses the derived account from the redemption code prefix, redeems the code, returns the API key and same-origin Base URL values, and points users to Model Square for model selection instead of hard-coding recommended models.
+
+All default-theme WeChat customer-service buttons/links touched by this customization must show the QR code in-place on hover/focus/click and must not navigate to a new tab. The popover must show the WeChat ID `deepseek998877`, QR code, and a copy button.
+
+**Affected files:**
+
+- `controller/quick_exchange.go`
+- `service/quick_exchange.go`
+- `router/api-router.go`
+- `web/default/src/components/copy-button.tsx`
+- `web/default/src/components/wechat-support-popover.tsx`
+- `web/default/src/components/layout/constants.ts`
+- `web/default/src/components/layout/components/nav-link-item.tsx`
+- `web/default/src/features/home/api.ts`
+- `web/default/src/features/home/types.ts`
+- `web/default/src/features/home/components/quick-exchange-dialog.tsx`
+- `web/default/src/features/home/components/sections/hero.tsx`
+- `web/default/src/features/pricing/index.tsx`
+- `web/default/src/features/usage-logs/components/common-logs-filter-bar.tsx`
+- `web/classic/src/components/layout/headerbar/Navigation.jsx`
+- `web/classic/src/components/table/usage-logs/UsageLogsActions.jsx`
+- `web/default/src/i18n/locales/en.json`
+- `web/default/src/i18n/locales/fr.json`
+- `web/default/src/i18n/locales/ja.json`
+- `web/default/src/i18n/locales/ru.json`
+- `web/default/src/i18n/locales/vi.json`
+- `web/default/src/i18n/locales/zh.json`
+
+**Upstream merge notes:**
+
+- Keep `/api/quick_exchange` local to the Go backend; do not restore the external `https://api-guid.silra.cn/get_api_key` dependency or a Flask sidecar flow.
+- Preserve `middleware.CriticalRateLimit()` on the public quick-exchange route.
+- Preserve idempotency for already-used redemption codes when `UsedUserId` matches the derived account.
+- If upstream changes home, pricing, usage logs, or navigation contact UI, keep customer-service QR behavior in-place instead of link navigation.
+- Classic usage logs and header contact entries are included because the platform-wide customer-service behavior must not open QR links in a new browser tab.
+
+**Validation:**
+
+- `go test ./controller ./service ./router`
+- `cd web/default && bun run i18n:sync`
+- `cd web/default && bun run typecheck`
+- `cd web/default && bun run build`
+- `cd web/classic && npm run build`
+
 ### 2026-05-25 — China-Compliant Home Page Provider Display
 
 **Behavior to preserve:** The default and classic home pages must not promote overseas model/provider names such as OpenAI/GPT, Claude, Gemini, Llama, xAI/Grok, Cohere, Suno, Midjourney, or Azure AI in the public landing content. Keep home page examples neutral or focused on domestic/self-hosted providers.

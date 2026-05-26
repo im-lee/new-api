@@ -66,3 +66,5 @@ export const MOBILE_DRAWER_CONFIG = {
 
 export const CUSTOMER_SERVICE_QR_CODE_URL =
   'https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png'
+
+export const CUSTOMER_SERVICE_WECHAT_ID = 'deepseek998877'

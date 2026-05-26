@@ -17,10 +17,13 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 For commercial licensing, please contact support@quantumnous.com
 */
 import { Link } from '@tanstack/react-router'
-import { ArrowRight } from 'lucide-react'
+import { useState } from 'react'
+import { ArrowRight, MessageCircle, Ticket } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
+import { WeChatSupportPopover } from '@/components/wechat-support-popover'
 import { Button } from '@/components/ui/button'
 import { HeroTerminalDemo } from '../hero-terminal-demo'
+import { QuickExchangeDialog } from '../quick-exchange-dialog'
 
 interface HeroProps {
   className?: string
@@ -29,6 +32,7 @@ interface HeroProps {
 
 export function Hero(props: HeroProps) {
   const { t } = useTranslation()
+  const [quickExchangeOpen, setQuickExchangeOpen] = useState(false)
 
   return (
     <section className='relative z-10 flex flex-col items-center overflow-hidden px-6 pt-28 pb-16 md:pt-36 md:pb-24'>
@@ -68,17 +72,31 @@ export function Hero(props: HeroProps) {
           {t('Power AI applications, manage digital assets, connect the Future')}
         </p>
         <div
-          className='landing-animate-fade-up mt-8 flex items-center gap-3 opacity-0'
+          className='landing-animate-fade-up mt-8 flex flex-wrap items-center justify-center gap-3 opacity-0'
           style={{ animationDelay: '160ms' }}
         >
           {props.isAuthenticated ? (
-            <Button
-              className='group rounded-lg'
-              render={<Link to='/dashboard' />}
-            >
-              {t('Go to Dashboard')}
-              <ArrowRight className='ml-1 size-3.5 transition-transform duration-200 group-hover:translate-x-0.5' />
-            </Button>
+            <>
+              <Button
+                className='group rounded-lg'
+                render={<Link to='/dashboard' />}
+              >
+                {t('Go to Dashboard')}
+                <ArrowRight className='ml-1 size-3.5 transition-transform duration-200 group-hover:translate-x-0.5' />
+              </Button>
+              <Button
+                variant='outline'
+                className='rounded-lg'
+                onClick={() => setQuickExchangeOpen(true)}
+              >
+                <Ticket className='size-3.5' />
+                {t('Quick Exchange')}
+              </Button>
+              <WeChatSupportPopover className='rounded-lg'>
+                <MessageCircle className='size-3.5' />
+                {t('Contact customer service')}
+              </WeChatSupportPopover>
+            </>
           ) : (
             <>
               <Button
@@ -95,6 +113,18 @@ export function Hero(props: HeroProps) {
               >
                 {t('View Pricing')}
               </Button>
+              <Button
+                variant='outline'
+                className='border-border/50 hover:border-border hover:bg-muted/50 rounded-lg'
+                onClick={() => setQuickExchangeOpen(true)}
+              >
+                <Ticket className='size-3.5' />
+                {t('Quick Exchange')}
+              </Button>
+              <WeChatSupportPopover className='border-border/50 hover:border-border hover:bg-muted/50 rounded-lg'>
+                <MessageCircle className='size-3.5' />
+                {t('Contact customer service')}
+              </WeChatSupportPopover>
             </>
           )}
         </div>
@@ -106,6 +136,10 @@ export function Hero(props: HeroProps) {
       >
         <HeroTerminalDemo />
       </div>
+      <QuickExchangeDialog
+        open={quickExchangeOpen}
+        onOpenChange={setQuickExchangeOpen}
+      />
     </section>
   )
 }

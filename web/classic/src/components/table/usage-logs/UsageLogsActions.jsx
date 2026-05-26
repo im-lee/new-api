@@ -36,6 +36,7 @@ const LogsActions = ({
 }) => {
   const showSkeleton = useMinimumLoadingTime(loadingStat);
   const needSkeleton = !showStat || showSkeleton;
+  const [wechatVisible, setWechatVisible] = React.useState(false);
 
   const notice = (
     <div
@@ -52,8 +53,10 @@ const LogsActions = ({
         )}
       </span>
       <Popover
-        trigger='hover'
+        trigger='custom'
         position='bottom'
+        visible={wechatVisible}
+        onVisibleChange={setWechatVisible}
         content={
           <div className='p-2 text-center'>
             <div className='mb-2 text-sm font-semibold text-semi-color-text-0'>
@@ -67,15 +70,18 @@ const LogsActions = ({
           </div>
         }
       >
-        <a
-          href={WECHAT_SUPPORT_QR_CODE_URL}
-          target='_blank'
-          rel='noopener noreferrer'
-          className='font-semibold underline underline-offset-4'
+        <button
+          type='button'
+          className='border-0 bg-transparent p-0 font-semibold underline underline-offset-4'
           style={{ color: '#92400e' }}
+          onMouseEnter={() => setWechatVisible(true)}
+          onMouseLeave={() => setWechatVisible(false)}
+          onFocus={() => setWechatVisible(true)}
+          onBlur={() => setWechatVisible(false)}
+          onClick={() => setWechatVisible(true)}
         >
           {t('微信客服')}
-        </a>
+        </button>
       </Popover>
       <span>{t('。')}</span>
     </div>

@@ -37,3 +37,19 @@ export interface HomePageContentResult {
   isLoaded: boolean
   isUrl: boolean
 }
+
+export interface QuickExchangeResult {
+  username: string
+  password: string
+  api_key: string
+  base_url: string
+  base_url_v1: string
+  models_url: string
+  recommended_models: string[]
+}
+
+export interface QuickExchangeResponse {
+  success: boolean
+  message?: string
+  data?: QuickExchangeResult
+}

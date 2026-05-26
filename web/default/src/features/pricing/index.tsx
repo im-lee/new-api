@@ -20,11 +20,8 @@ import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card'
+import { WeChatSupportPopover } from '@/components/wechat-support-popover'
+import { CUSTOMER_SERVICE_WECHAT_ID } from '@/components/layout/constants'
 import {
   LoadingSkeleton,
   EmptyState,
@@ -38,10 +35,6 @@ import {
 import { EXCLUDED_GROUPS, VIEW_MODES } from './constants'
 import { useFilters } from './hooks/use-filters'
 import { usePricingData } from './hooks/use-pricing-data'
-
-const MODEL_SUPPORT_WECHAT_ID = 'deepseek998877'
-const MODEL_SUPPORT_QR_CODE_URL =
-  'https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png'
 
 export function Pricing() {
   const { t } = useTranslation()
@@ -208,33 +201,16 @@ export function Pricing() {
                   <div className='flex flex-wrap items-center gap-2 text-xs sm:text-sm'>
                     <span className='font-medium text-amber-800 dark:text-amber-200'>
                       {t('WeChat ID: {{wechatId}}', {
-                        wechatId: MODEL_SUPPORT_WECHAT_ID,
+                        wechatId: CUSTOMER_SERVICE_WECHAT_ID,
                       })}
                     </span>
-                    <HoverCard>
-                      <HoverCardTrigger
-                        render={
-                          <a
-                            href={MODEL_SUPPORT_QR_CODE_URL}
-                            target='_blank'
-                            rel='noopener noreferrer'
-                            className='inline-flex items-center rounded-full border border-amber-300/80 bg-white/80 px-3 py-1 font-medium text-amber-900 transition-colors hover:bg-white dark:border-amber-300/30 dark:bg-amber-50/10 dark:text-amber-100 dark:hover:bg-amber-50/15'
-                          >
-                            {t('Hover to view the WeChat QR code')}
-                          </a>
-                        }
-                      />
-                      <HoverCardContent className='w-56 border border-amber-200 bg-white p-3 text-center shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'>
-                        <div className='mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100'>
-                          {t('Scan to add WeChat support')}
-                        </div>
-                        <img
-                          src={MODEL_SUPPORT_QR_CODE_URL}
-                          alt={t('WeChat support QR code')}
-                          className='mx-auto h-44 w-44 rounded-md object-contain'
-                        />
-                      </HoverCardContent>
-                    </HoverCard>
+                    <WeChatSupportPopover
+                      unstyled
+                      className='inline-flex items-center rounded-full border border-amber-300/80 bg-white/80 px-3 py-1 font-medium text-amber-900 transition-colors hover:bg-white dark:border-amber-300/30 dark:bg-amber-50/10 dark:text-amber-100 dark:hover:bg-amber-50/15'
+                      contentClassName='border border-amber-200 bg-white shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'
+                    >
+                      {t('Hover to view the WeChat QR code')}
+                    </WeChatSupportPopover>
                   </div>
                 </div>
                 <p className='max-w-sm text-xs leading-5 text-amber-700 sm:text-right dark:text-amber-200/90'>

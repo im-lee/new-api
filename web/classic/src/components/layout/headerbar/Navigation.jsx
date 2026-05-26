@@ -33,6 +33,8 @@ const Navigation = ({
   pricingRequireAuth,
   t,
 }) => {
+  const [visibleContactKey, setVisibleContactKey] = React.useState(null);
+
   const renderNavLinks = () => {
     const baseClasses =
       'flex-shrink-0 flex items-center gap-1 font-semibold rounded-md transition-all duration-200 ease-in-out';
@@ -49,7 +51,11 @@ const Navigation = ({
           <Popover
             key={link.itemKey}
             position='bottom'
-            trigger='hover'
+            trigger='custom'
+            visible={visibleContactKey === link.itemKey}
+            onVisibleChange={(visible) => {
+              setVisibleContactKey(visible ? link.itemKey : null);
+            }}
             content={
               <div className='p-2 text-center'>
                 <div className='mb-2 text-sm text-semi-color-text-0 whitespace-normal'>
@@ -66,6 +72,11 @@ const Navigation = ({
             <button
               type='button'
               className={`${commonLinkClasses} bg-transparent border-0 cursor-pointer`}
+              onMouseEnter={() => setVisibleContactKey(link.itemKey)}
+              onMouseLeave={() => setVisibleContactKey(null)}
+              onFocus={() => setVisibleContactKey(link.itemKey)}
+              onBlur={() => setVisibleContactKey(null)}
+              onClick={() => setVisibleContactKey(link.itemKey)}
             >
               {linkContent}
             </button>

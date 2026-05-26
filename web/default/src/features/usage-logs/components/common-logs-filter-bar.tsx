@@ -38,11 +38,7 @@ import {
   TooltipContent,
   TooltipTrigger,
 } from '@/components/ui/tooltip'
-import {
-  HoverCard,
-  HoverCardContent,
-  HoverCardTrigger,
-} from '@/components/ui/hover-card'
+import { WeChatSupportPopover } from '@/components/wechat-support-popover'
 import { DataTableToolbar } from '@/components/data-table'
 import { LOG_TYPES } from '../constants'
 import { buildSearchParams } from '../lib/filter'
@@ -54,8 +50,6 @@ import { useUsageLogsContext } from './usage-logs-provider'
 
 const route = getRouteApi('/_authenticated/usage-logs/$section')
 const logTypeValues = ['0', '1', '2', '3', '4', '5', '6'] as const
-const WECHAT_SUPPORT_QR_CODE_URL =
-  'https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png'
 
 type LogTypeValue = (typeof logTypeValues)[number]
 
@@ -78,30 +72,13 @@ function UsageLogsRetentionNotice() {
         )}
       </span>
       <span>{t('Usage logs retention notice separator')}</span>
-      <HoverCard>
-        <HoverCardTrigger
-          render={
-            <a
-              href={WECHAT_SUPPORT_QR_CODE_URL}
-              target='_blank'
-              rel='noopener noreferrer'
-              className='font-semibold text-amber-900 underline decoration-amber-500/60 underline-offset-4 transition-colors hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-200'
-            >
-              {t('WeChat support')}
-            </a>
-          }
-        />
-        <HoverCardContent className='w-56 border border-amber-200 bg-white p-3 text-center shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'>
-          <div className='mb-2 text-sm font-semibold text-slate-900 dark:text-slate-100'>
-            {t('Scan to add WeChat support')}
-          </div>
-          <img
-            src={WECHAT_SUPPORT_QR_CODE_URL}
-            alt={t('WeChat support QR code')}
-            className='mx-auto h-44 w-44 rounded-md object-contain'
-          />
-        </HoverCardContent>
-      </HoverCard>
+      <WeChatSupportPopover
+        unstyled
+        className='font-semibold text-amber-900 underline decoration-amber-500/60 underline-offset-4 transition-colors hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-200'
+        contentClassName='border border-amber-200 bg-white shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'
+      >
+        {t('WeChat support')}
+      </WeChatSupportPopover>
       <span>{t('Usage logs retention notice suffix')}</span>
     </div>
   )
