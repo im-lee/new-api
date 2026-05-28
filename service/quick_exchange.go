@@ -3,6 +3,7 @@ package service
 import (
 	"errors"
 	"fmt"
+	"net/http"
 	"regexp"
 	"strings"
 
@@ -27,7 +28,7 @@ type QuickExchangeResult struct {
 	RecommendedModels []string `json:"recommended_models"`
 }
 
-func QuickExchange(redemptionKey string, requestBaseURL string) (*QuickExchangeResult, error) {
+func QuickExchange(redemptionKey string, request *http.Request) (*QuickExchangeResult, error) {
 	key := strings.TrimSpace(redemptionKey)
 	if !quickExchangeKeyPattern.MatchString(key) {
 		return nil, errors.New("兑换码格式不正确，请输入 32 位字母和数字组成的兑换码")
@@ -60,10 +61,7 @@ func QuickExchange(redemptionKey string, requestBaseURL string) (*QuickExchangeR
 		return nil, err
 	}
 
-	baseURL := strings.TrimRight(system_setting.ServerAddress, "/")
-	if baseURL == "" {
-		baseURL = strings.TrimRight(requestBaseURL, "/")
-	}
+	baseURL := getQuickExchangeBaseURL(request)
 	baseURLV1 := ""
 	modelsURL := ""
 	if baseURL != "" {
@@ -74,7 +72,7 @@ func QuickExchange(redemptionKey string, requestBaseURL string) (*QuickExchangeR
 	return &QuickExchangeResult{
 		Username:          username,
 		Password:          password,
-		APIKey:            "sk-" + strings.TrimPrefix(token.Key, "sk-"),
+		APIKey:            "sk-" + strings.TrimPrefix(token.GetFullKey(), "sk-"),
 		BaseURL:           baseURL,
 		BaseURLV1:         baseURLV1,
 		ModelsURL:         modelsURL,
@@ -126,6 +124,7 @@ func getOrCreateQuickExchangeUser(username string, password string) (*model.User
 		Password:    password,
 		DisplayName: username,
 		Role:        common.RoleCommonUser,
+		Status:      common.UserStatusEnabled,
 	}
 	if err := user.Insert(0); err != nil {
 		return nil, fmt.Errorf("创建账号失败: %w", err)
@@ -181,9 +180,48 @@ func getOrCreateQuickExchangeToken(userID int, username string) (*model.Token, e
 	}
 	if setting.DefaultUseAutoGroup {
 		token.Group = "auto"
+		token.CrossGroupRetry = true
 	}
 	if err := token.Insert(); err != nil {
 		return nil, fmt.Errorf("创建 API Key 失败: %w", err)
 	}
 	return token, nil
+}
+
+func getQuickExchangeBaseURL(request *http.Request) string {
+	if system_setting.ServerAddress != "" {
+		return strings.TrimRight(system_setting.ServerAddress, "/")
+	}
+	if request == nil {
+		return ""
+	}
+
+	scheme := firstQuickExchangeHeaderValue(request.Header.Get("X-Forwarded-Proto"))
+	if scheme == "" {
+		scheme = firstQuickExchangeHeaderValue(request.Header.Get("X-Forwarded-Protocol"))
+	}
+	if scheme == "" && request.Header.Get("X-Forwarded-Ssl") == "on" {
+		scheme = "https"
+	}
+	if scheme == "" {
+		if request.TLS != nil {
+			scheme = "https"
+		} else {
+			scheme = "http"
+		}
+	}
+
+	host := firstQuickExchangeHeaderValue(request.Header.Get("X-Forwarded-Host"))
+	if host == "" {
+		host = request.Host
+	}
+	return strings.TrimRight(scheme+"://"+host, "/")
+}
+
+func firstQuickExchangeHeaderValue(value string) string {
+	value = strings.TrimSpace(value)
+	if value == "" {
+		return ""
+	}
+	return strings.TrimSpace(strings.Split(value, ",")[0])
 }

@@ -115,7 +115,7 @@ export function QuickExchangeDialog({
           <DialogTitle>{t('Quick Exchange')}</DialogTitle>
           <DialogDescription>
             {t(
-              'Enter your redemption code to automatically create an account and get an API key.'
+              'Enter your redemption code to create or reuse the linked account and get an API key.'
             )}
           </DialogDescription>
         </DialogHeader>
