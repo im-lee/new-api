@@ -102,7 +102,12 @@ export function WeChatSupportPopover({
         {children ?? t('Contact customer service')}
       </PopoverTrigger>
       <PopoverContent
-        className={cn('w-56 p-3 text-center', contentClassName)}
+        className={cn(
+          'w-56 p-3 text-center',
+          closeOnTriggerLeave &&
+            '[@media(hover:hover)]:pointer-events-none',
+          contentClassName
+        )}
         onMouseEnter={closeOnTriggerLeave ? undefined : openPopover}
         onMouseLeave={closeOnTriggerLeave ? undefined : scheduleClose}
       >

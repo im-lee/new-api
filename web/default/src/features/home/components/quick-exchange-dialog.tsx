@@ -50,12 +50,15 @@ function ResultRow({ label, value, copyLabel }: ResultRowProps) {
   return (
     <div className='grid gap-1.5'>
       <div className='text-muted-foreground text-xs font-medium'>{label}</div>
-      <div className='bg-muted/50 flex min-h-9 items-center gap-2 rounded-lg border px-2.5 py-1.5'>
-        <code className='min-w-0 flex-1 break-all text-xs'>{value}</code>
+      <div className='bg-muted/50 flex min-h-9 flex-col items-stretch gap-2 rounded-lg border px-2.5 py-1.5 sm:flex-row sm:items-center'>
+        <code className='min-w-0 flex-1 break-all text-xs leading-5'>
+          {value}
+        </code>
         <CopyButton
           value={value}
           size='icon-sm'
           tooltip={copyLabel}
+          className='self-end sm:self-auto'
         />
       </div>
     </div>
@@ -110,7 +113,7 @@ export function QuickExchangeDialog({
 
   return (
     <Dialog open={open} onOpenChange={handleOpenChange}>
-      <DialogContent className='max-h-[90vh] overflow-y-auto sm:max-w-xl'>
+      <DialogContent className='max-h-[calc(100dvh-1rem)] overflow-y-auto sm:max-h-[90vh] sm:max-w-xl'>
         <DialogHeader>
           <DialogTitle>{t('Quick Exchange')}</DialogTitle>
           <DialogDescription>
@@ -158,7 +161,11 @@ export function QuickExchangeDialog({
             </div>
 
             <DialogFooter className='bg-transparent p-0'>
-              <Button type='submit' disabled={isSubmitting}>
+              <Button
+                type='submit'
+                disabled={isSubmitting}
+                className='w-full sm:w-auto'
+              >
                 {isSubmitting && <Loader2 className='animate-spin' />}
                 {t('Exchange now')}
               </Button>
@@ -212,7 +219,7 @@ export function QuickExchangeDialog({
               <Button
                 variant='outline'
                 size='sm'
-                className='mt-3'
+                className='mt-3 w-full sm:w-auto'
                 render={<Link to='/pricing' />}
               >
                 {t('Open Model Square')}
