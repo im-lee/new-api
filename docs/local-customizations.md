@@ -129,13 +129,15 @@ The default theme 404 page must show an auto-redirect notice with a visible coun
 
 ### 2026-05-21 — Usage Logs Retention Notice
 
-**Behavior to preserve:** Usage logs pages must show a yellow notice below the quota/RPM/TPM summary and above search filters:
+**Behavior to preserve:** Usage logs pages must show a dismissible yellow notice below the quota/RPM/TPM summary and above search filters:
 
 `仅展示最近1-2周的使用记录，请自行做好全量日志留存，如有其他问题请咨询微信客服。`
 
 The `微信客服` text must show the WeChat support QR code on hover/click using:
 
 `https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png`
+
+The notice must include a close control so users can hide it locally in both frontend themes.
 
 **Affected files:**
 
@@ -162,6 +164,7 @@ The `微信客服` text must show the WeChat support QR code on hover/click usin
 - In `web/default`, the notice belongs in the common usage logs filter/header area.
 - In `web/classic`, the notice belongs in the usage logs stats/header area rendered above filters.
 - Preserve the wording `仅展示`, not `仅统计和展示`.
+- Preserve the close control when upstream changes the usage logs header/filter layout.
 
 **Validation:**
 
@@ -170,11 +173,12 @@ The `微信客服` text must show the WeChat support QR code on hover/click usin
 
 ### 2026-05-19 — Model Square Support Notice And QR Contact
 
-**Behavior to preserve:** The model square/pricing page must show a yellow support notice telling users to contact WeChat support for additional model support. The notice must expose:
+**Behavior to preserve:** The model square/pricing page must show a dismissible yellow support notice telling users to contact WeChat support for additional model support. The notice must expose:
 
 - WeChat ID: `deepseek998877`
 - QR code URL: `https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png`
 - Warning that third-party platform sales support does not handle model-support requests.
+- A close control so users can hide the notice locally in both frontend themes.
 
 **Affected files:**
 
@@ -199,6 +203,7 @@ The `微信客服` text must show the WeChat support QR code on hover/click usin
 
 - Keep the notice in both `web/default` and `web/classic` model-pricing pages.
 - Use hover on desktop and click-compatible behavior on mobile where the theme component supports it.
+- Preserve the close control when upstream changes the model square/pricing layout.
 - Do not reintroduce the reverted one-line notice from commit `708c2d4b2`; preserve the richer notice from `63870b4ed`.
 
 **Validation:**

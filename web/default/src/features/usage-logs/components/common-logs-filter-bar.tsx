@@ -20,7 +20,7 @@ import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { useNavigate, getRouteApi } from '@tanstack/react-router'
 import { type Table } from '@tanstack/react-table'
-import { Eye, EyeOff } from 'lucide-react'
+import { Eye, EyeOff, X } from 'lucide-react'
 import { useTranslation } from 'react-i18next'
 import { useIsAdmin } from '@/hooks/use-admin'
 import { Button } from '@/components/ui/button'
@@ -66,23 +66,38 @@ interface CommonLogsFilterBarProps<TData> {
 
 function UsageLogsRetentionNotice() {
   const { t } = useTranslation()
+  const [visible, setVisible] = useState(true)
+
+  if (!visible) return null
 
   return (
-    <div className='rounded-lg border border-amber-300/70 bg-amber-50/90 px-3 py-2.5 text-sm leading-6 text-amber-950 shadow-xs dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100'>
-      <span>
-        {t(
-          'Only usage records from the last 1-2 weeks are displayed. Please keep your own full log archive. If you have other questions, please contact'
-        )}
-      </span>
-      <span>{t('Usage logs retention notice separator')}</span>
-      <WeChatSupportPopover
-        unstyled
-        className='font-semibold text-amber-900 underline decoration-amber-500/60 underline-offset-4 transition-colors hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-200'
-        contentClassName='border border-amber-200 bg-white shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'
+    <div className='relative rounded-lg border border-amber-300/70 bg-amber-50/90 py-2.5 pr-10 pl-3 text-sm leading-6 text-amber-950 shadow-xs dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100'>
+      <div>
+        <span>
+          {t(
+            'Only usage records from the last 1-2 weeks are displayed. Please keep your own full log archive. If you have other questions, please contact'
+          )}
+        </span>
+        <span>{t('Usage logs retention notice separator')}</span>
+        <WeChatSupportPopover
+          unstyled
+          className='font-semibold text-amber-900 underline decoration-amber-500/60 underline-offset-4 transition-colors hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-200'
+          contentClassName='border border-amber-200 bg-white shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'
+        >
+          {t('WeChat support')}
+        </WeChatSupportPopover>
+        <span>{t('Usage logs retention notice suffix')}</span>
+      </div>
+      <Button
+        type='button'
+        variant='ghost'
+        size='icon'
+        aria-label={t('Close')}
+        className='absolute top-2 right-2 size-6 text-amber-800/70 hover:bg-amber-100/80 hover:text-amber-950 dark:text-amber-100/70 dark:hover:bg-amber-400/10 dark:hover:text-amber-50'
+        onClick={() => setVisible(false)}
       >
-        {t('WeChat support')}
-      </WeChatSupportPopover>
-      <span>{t('Usage logs retention notice suffix')}</span>
+        <X className='size-3.5' />
+      </Button>
     </div>
   )
 }

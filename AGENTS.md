@@ -66,7 +66,7 @@ This repository carries local product customizations on top of upstream code. Pr
   - affected area and files;
   - what behavior must be preserved;
   - upstream-merge notes and validation commands.
-- For frontend-visible changes, check both themes unless the user explicitly names only one:
+- For frontend-visible changes, implement and validate the change in both themes by default unless the user explicitly scopes the request to one theme:
   - `web/default` (React 19, Rsbuild, Base UI, Tailwind);
   - `web/classic` (React 18, Vite, Semi Design).
 - Frontend i18n must be updated in the matching locale system for every touched theme.

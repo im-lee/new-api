@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React from 'react';
 import { Tag, Space, Skeleton, Popover } from '@douyinfe/semi-ui';
+import { X } from 'lucide-react';
 import { renderQuota } from '../../../helpers';
 import CompactModeToggle from '../../common/ui/CompactModeToggle';
 import { useMinimumLoadingTime } from '../../../hooks/common/useMinimumLoadingTime';
@@ -37,55 +38,67 @@ const LogsActions = ({
   const showSkeleton = useMinimumLoadingTime(loadingStat);
   const needSkeleton = !showStat || showSkeleton;
   const [wechatVisible, setWechatVisible] = React.useState(false);
+  const [noticeVisible, setNoticeVisible] = React.useState(true);
 
-  const notice = (
+  const notice = noticeVisible ? (
     <div
-      className='w-full rounded-xl border px-4 py-3 text-sm shadow-sm'
+      className='relative w-full rounded-xl border py-3 pr-10 pl-4 text-sm shadow-sm'
       style={{
         backgroundColor: '#fef3c7',
         borderColor: '#fcd34d',
         color: '#92400e',
       }}
     >
-      <span>
-        {t(
-          '仅展示最近1-2周的使用记录，请自行做好全量日志留存，如有其他问题请咨询'
-        )}
-      </span>
-      <Popover
-        trigger='custom'
-        position='bottom'
-        visible={wechatVisible}
-        onVisibleChange={setWechatVisible}
-        content={
-          <div className='p-2 text-center'>
-            <div className='mb-2 text-sm font-semibold text-semi-color-text-0'>
-              {t('扫码添加微信客服')}
+      <div>
+        <span>
+          {t(
+            '仅展示最近1-2周的使用记录，请自行做好全量日志留存，如有其他问题请咨询'
+          )}
+        </span>
+        <Popover
+          trigger='custom'
+          position='bottom'
+          visible={wechatVisible}
+          onVisibleChange={setWechatVisible}
+          content={
+            <div className='p-2 text-center'>
+              <div className='mb-2 text-sm font-semibold text-semi-color-text-0'>
+                {t('扫码添加微信客服')}
+              </div>
+              <img
+                src={WECHAT_SUPPORT_QR_CODE_URL}
+                alt={t('微信客服二维码')}
+                className='block h-40 w-40 rounded-md object-contain'
+              />
             </div>
-            <img
-              src={WECHAT_SUPPORT_QR_CODE_URL}
-              alt={t('微信客服二维码')}
-              className='block h-40 w-40 rounded-md object-contain'
-            />
-          </div>
-        }
-      >
-        <button
-          type='button'
-          className='border-0 bg-transparent p-0 font-semibold underline underline-offset-4'
-          style={{ color: '#92400e' }}
-          onMouseEnter={() => setWechatVisible(true)}
-          onMouseLeave={() => setWechatVisible(false)}
-          onFocus={() => setWechatVisible(true)}
-          onBlur={() => setWechatVisible(false)}
-          onClick={() => setWechatVisible(true)}
+          }
         >
-          {t('微信客服')}
-        </button>
-      </Popover>
-      <span>{t('。')}</span>
+          <button
+            type='button'
+            className='border-0 bg-transparent p-0 font-semibold underline underline-offset-4'
+            style={{ color: '#92400e' }}
+            onMouseEnter={() => setWechatVisible(true)}
+            onMouseLeave={() => setWechatVisible(false)}
+            onFocus={() => setWechatVisible(true)}
+            onBlur={() => setWechatVisible(false)}
+            onClick={() => setWechatVisible(true)}
+          >
+            {t('微信客服')}
+          </button>
+        </Popover>
+        <span>{t('。')}</span>
+      </div>
+      <button
+        type='button'
+        aria-label={t('关闭')}
+        className='absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full border-0 bg-transparent text-lg leading-none transition-colors hover:bg-amber-200/70'
+        style={{ color: '#92400e' }}
+        onClick={() => setNoticeVisible(false)}
+      >
+        <X size={14} aria-hidden='true' />
+      </button>
     </div>
-  );
+  ) : null;
 
   const placeholder = (
     <Space>

@@ -19,6 +19,7 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React from 'react';
 import { Popover } from '@douyinfe/semi-ui';
+import { X } from 'lucide-react';
 import PricingTopSection from '../header/PricingTopSection';
 import PricingView from './PricingView';
 
@@ -27,6 +28,8 @@ const MODEL_SUPPORT_QR_CODE_URL =
   'https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png';
 
 const PricingContent = ({ isMobile, sidebarProps, ...props }) => {
+  const [supportNoticeVisible, setSupportNoticeVisible] = React.useState(true);
+
   return (
     <div
       className={isMobile ? 'pricing-content-mobile' : 'pricing-scroll-hide'}
@@ -50,56 +53,67 @@ const PricingContent = ({ isMobile, sidebarProps, ...props }) => {
         />
       </div>
 
-      <div
-        className='mx-4 mt-3 rounded-xl border px-4 py-3 text-sm shadow-sm'
-        style={{
-          backgroundColor: '#fef3c7',
-          borderColor: '#fcd34d',
-          color: '#92400e',
-        }}
-      >
-        <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
-          <div className='space-y-1.5'>
-            <div className='font-semibold'>
-              {props.t('需要更多模型支持？请联系微信客服')}
-            </div>
-            <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]'>
-              <span>
-                {props.t('微信号：{{wechatId}}', {
-                  wechatId: MODEL_SUPPORT_WECHAT_ID,
-                })}
-              </span>
-              <Popover
-                trigger={isMobile ? 'click' : 'hover'}
-                position='bottom'
-                content={
-                  <div className='p-2 text-center'>
-                    <div className='mb-2 text-sm font-semibold text-semi-color-text-0'>
-                      {props.t('扫码添加微信客服')}
+      {supportNoticeVisible && (
+        <div
+          className='relative mx-4 mt-3 rounded-xl border py-3 pr-10 pl-4 text-sm shadow-sm'
+          style={{
+            backgroundColor: '#fef3c7',
+            borderColor: '#fcd34d',
+            color: '#92400e',
+          }}
+        >
+          <div className='flex flex-col gap-3 md:flex-row md:items-center md:justify-between'>
+            <div className='space-y-1.5'>
+              <div className='font-semibold'>
+                {props.t('需要更多模型支持？请联系微信客服')}
+              </div>
+              <div className='flex flex-wrap items-center gap-x-3 gap-y-1 text-[13px]'>
+                <span>
+                  {props.t('微信号：{{wechatId}}', {
+                    wechatId: MODEL_SUPPORT_WECHAT_ID,
+                  })}
+                </span>
+                <Popover
+                  trigger={isMobile ? 'click' : 'hover'}
+                  position='bottom'
+                  content={
+                    <div className='p-2 text-center'>
+                      <div className='mb-2 text-sm font-semibold text-semi-color-text-0'>
+                        {props.t('扫码添加微信客服')}
+                      </div>
+                      <img
+                        src={MODEL_SUPPORT_QR_CODE_URL}
+                        alt={props.t('微信客服二维码')}
+                        className='block h-40 w-40 rounded-md object-contain'
+                      />
                     </div>
-                    <img
-                      src={MODEL_SUPPORT_QR_CODE_URL}
-                      alt={props.t('微信客服二维码')}
-                      className='block h-40 w-40 rounded-md object-contain'
-                    />
-                  </div>
-                }
-              >
-                <button
-                  type='button'
-                  className='cursor-pointer border-0 bg-transparent p-0 font-semibold underline underline-offset-4'
-                  style={{ color: '#92400e' }}
+                  }
                 >
-                  {props.t('查看微信二维码')}
-                </button>
-              </Popover>
+                  <button
+                    type='button'
+                    className='cursor-pointer border-0 bg-transparent p-0 font-semibold underline underline-offset-4'
+                    style={{ color: '#92400e' }}
+                  >
+                    {props.t('查看微信二维码')}
+                  </button>
+                </Popover>
+              </div>
+            </div>
+            <div className='max-w-xs text-xs leading-5 md:text-right'>
+              {props.t('第三方平台销售客服不受理模型支持问题。')}
             </div>
           </div>
-          <div className='max-w-xs text-xs leading-5 md:text-right'>
-            {props.t('第三方平台销售客服不受理模型支持问题。')}
-          </div>
+          <button
+            type='button'
+            aria-label={props.t('关闭')}
+            className='absolute top-2 right-2 flex h-6 w-6 items-center justify-center rounded-full border-0 bg-transparent text-lg leading-none transition-colors hover:bg-amber-200/70'
+            style={{ color: '#92400e' }}
+            onClick={() => setSupportNoticeVisible(false)}
+          >
+            <X size={14} aria-hidden='true' />
+          </button>
         </div>
-      </div>
+      )}
 
       {/* 可滚动的内容区域 */}
       <div

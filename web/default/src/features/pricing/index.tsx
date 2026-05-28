@@ -18,10 +18,12 @@ For commercial licensing, please contact support@quantumnous.com
 */
 import { useCallback, useMemo, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { X } from 'lucide-react'
 import { PublicLayout } from '@/components/layout'
 import { PageTransition } from '@/components/page-transition'
 import { WeChatSupportPopover } from '@/components/wechat-support-popover'
 import { CUSTOMER_SERVICE_WECHAT_ID } from '@/components/layout/constants'
+import { Button } from '@/components/ui/button'
 import {
   LoadingSkeleton,
   EmptyState,
@@ -41,6 +43,7 @@ export function Pricing() {
   const [selectedModelName, setSelectedModelName] = useState<string | null>(
     null
   )
+  const [showSupportNotice, setShowSupportNotice] = useState(true)
 
   const {
     models,
@@ -192,34 +195,46 @@ export function Pricing() {
                 'Discover curated AI models, compare pricing and capabilities, and choose the right model for every scenario.'
               )}
             </p>
-            <div className='mx-auto mt-5 max-w-3xl rounded-2xl border border-amber-300/70 bg-amber-50/90 p-4 text-left text-amber-950 shadow-sm backdrop-blur sm:mt-6 sm:p-5 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100'>
-              <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
-                <div className='space-y-1.5'>
-                  <p className='text-sm font-semibold sm:text-[15px]'>
-                    {t('Need more model support? Contact WeChat support.')}
-                  </p>
-                  <div className='flex flex-wrap items-center gap-2 text-xs sm:text-sm'>
-                    <span className='font-medium text-amber-800 dark:text-amber-200'>
-                      {t('WeChat ID: {{wechatId}}', {
-                        wechatId: CUSTOMER_SERVICE_WECHAT_ID,
-                      })}
-                    </span>
-                    <WeChatSupportPopover
-                      unstyled
-                      className='inline-flex items-center rounded-full border border-amber-300/80 bg-white/80 px-3 py-1 font-medium text-amber-900 transition-colors hover:bg-white dark:border-amber-300/30 dark:bg-amber-50/10 dark:text-amber-100 dark:hover:bg-amber-50/15'
-                      contentClassName='border border-amber-200 bg-white shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'
-                    >
-                      {t('Hover to view the WeChat QR code')}
-                    </WeChatSupportPopover>
+            {showSupportNotice && (
+              <div className='relative mx-auto mt-5 max-w-3xl rounded-2xl border border-amber-300/70 bg-amber-50/90 p-4 pr-12 text-left text-amber-950 shadow-sm backdrop-blur sm:mt-6 sm:p-5 sm:pr-12 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100'>
+                <div className='flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between'>
+                  <div className='space-y-1.5'>
+                    <p className='text-sm font-semibold sm:text-[15px]'>
+                      {t('Need more model support? Contact WeChat support.')}
+                    </p>
+                    <div className='flex flex-wrap items-center gap-2 text-xs sm:text-sm'>
+                      <span className='font-medium text-amber-800 dark:text-amber-200'>
+                        {t('WeChat ID: {{wechatId}}', {
+                          wechatId: CUSTOMER_SERVICE_WECHAT_ID,
+                        })}
+                      </span>
+                      <WeChatSupportPopover
+                        unstyled
+                        className='inline-flex items-center rounded-full border border-amber-300/80 bg-white/80 px-3 py-1 font-medium text-amber-900 transition-colors hover:bg-white dark:border-amber-300/30 dark:bg-amber-50/10 dark:text-amber-100 dark:hover:bg-amber-50/15'
+                        contentClassName='border border-amber-200 bg-white shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'
+                      >
+                        {t('Hover to view the WeChat QR code')}
+                      </WeChatSupportPopover>
+                    </div>
                   </div>
+                  <p className='max-w-sm text-xs leading-5 text-amber-700 sm:text-right dark:text-amber-200/90'>
+                    {t(
+                      'Third-party sales support does not handle model support requests.'
+                    )}
+                  </p>
                 </div>
-                <p className='max-w-sm text-xs leading-5 text-amber-700 sm:text-right dark:text-amber-200/90'>
-                  {t(
-                    'Third-party sales support does not handle model support requests.'
-                  )}
-                </p>
+                <Button
+                  type='button'
+                  variant='ghost'
+                  size='icon'
+                  aria-label={t('Close')}
+                  className='absolute top-3 right-3 size-7 text-amber-800/70 hover:bg-amber-100/80 hover:text-amber-950 dark:text-amber-100/70 dark:hover:bg-amber-400/10 dark:hover:text-amber-50'
+                  onClick={() => setShowSupportNotice(false)}
+                >
+                  <X className='size-4' />
+                </Button>
               </div>
-            </div>
+            )}
             <SearchBar
               value={searchInput}
               onChange={setSearchInput}
