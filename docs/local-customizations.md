@@ -11,6 +11,33 @@ This file records local product customizations that must be preserved when mergi
 
 ## Entries
 
+### 2026-05-27 — Auth Legal Consent Attention Prompt
+
+**Behavior to preserve:** When user agreement or privacy policy consent is required on login or registration, primary login/register and OAuth/passkey/WeChat actions must remain clickable enough to show feedback. If the user attempts to continue without checking consent, the consent area must visibly shake, switch to an error-highlight state, and show an inline reminder to agree before continuing. This behavior must exist in both default and classic frontend themes.
+
+**Affected files:**
+
+- `web/default/src/features/auth/components/legal-consent.tsx`
+- `web/default/src/features/auth/components/oauth-providers.tsx`
+- `web/default/src/features/auth/sign-in/components/user-auth-form.tsx`
+- `web/default/src/features/auth/sign-up/components/sign-up-form.tsx`
+- `web/default/src/styles/index.css`
+- `web/classic/src/components/auth/LoginForm.jsx`
+- `web/classic/src/components/auth/RegisterForm.jsx`
+- `web/classic/src/index.css`
+
+**Upstream merge notes:**
+
+- Do not restore disabled-only behavior for legal consent. Keep the action handlers as the guard point so users receive visible guidance after clicking.
+- Keep OAuth, passkey, WeChat, username/password login, and username registration covered by the same consent prompt.
+- Preserve the reduced-motion fallback by disabling the shake animation when `prefers-reduced-motion: reduce` is active.
+
+**Validation:**
+
+- `cd web/default && bun run typecheck`
+- `cd web/default && bun run build`
+- `cd web/classic && npm run build`
+
 ### 2026-05-26 — Default Theme Quick Exchange And Hover Contact
 
 **Behavior to preserve:** The default home page must expose quick redemption and customer-service contact actions for both logged-in and logged-out users. Quick redemption posts to the local Go backend `/api/quick_exchange`, creates or reuses the derived account from the redemption code prefix, redeems the code, returns the API key and same-origin Base URL values, and points users to Model Square for model selection instead of hard-coding recommended models.

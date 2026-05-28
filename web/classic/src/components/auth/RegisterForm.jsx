@@ -104,6 +104,8 @@ const RegisterForm = () => {
   const [disableButton, setDisableButton] = useState(false);
   const [countdown, setCountdown] = useState(30);
   const [agreedToTerms, setAgreedToTerms] = useState(false);
+  const [termsPromptCount, setTermsPromptCount] = useState(0);
+  const [showTermsPrompt, setShowTermsPrompt] = useState(false);
   const [hasUserAgreement, setHasUserAgreement] = useState(false);
   const [hasPrivacyPolicy, setHasPrivacyPolicy] = useState(false);
   const [githubButtonState, setGithubButtonState] = useState('idle');
@@ -140,6 +142,7 @@ const RegisterForm = () => {
       status.telegram_oauth ||
       hasCustomOAuthProviders,
   );
+  const requiresTermsAgreement = hasUserAgreement || hasPrivacyPolicy;
 
   const [showEmailVerification, setShowEmailVerification] = useState(false);
 
@@ -176,7 +179,81 @@ const RegisterForm = () => {
     };
   }, []);
 
+  const promptTermsAgreement = () => {
+    setShowTermsPrompt(true);
+    setTermsPromptCount((value) => value + 1);
+    showInfo(t('请先阅读并同意用户协议和隐私政策'));
+    return false;
+  };
+
+  const ensureTermsAgreement = () => {
+    if (requiresTermsAgreement && !agreedToTerms) {
+      return promptTermsAgreement();
+    }
+    return true;
+  };
+
+  const handleTermsChange = (checked) => {
+    setAgreedToTerms(checked);
+    if (checked) {
+      setShowTermsPrompt(false);
+    }
+  };
+
+  const renderTermsConsent = (className = 'mt-6') => {
+    if (!requiresTermsAgreement) return null;
+
+    return (
+      <div
+        key={termsPromptCount}
+        className={`${className} legal-consent-box ${
+          showTermsPrompt ? 'legal-consent-box-alert legal-consent-shake' : ''
+        }`}
+      >
+        <Checkbox
+          checked={agreedToTerms}
+          onChange={(e) => handleTermsChange(e.target.checked)}
+        >
+          <Text size='small' className='text-gray-600'>
+            {t('我已阅读并同意')}
+            {hasUserAgreement && (
+              <>
+                <a
+                  href='/user-agreement'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-blue-600 hover:text-blue-800 mx-1'
+                >
+                  {t('用户协议')}
+                </a>
+              </>
+            )}
+            {hasUserAgreement && hasPrivacyPolicy && t('和')}
+            {hasPrivacyPolicy && (
+              <>
+                <a
+                  href='/privacy-policy'
+                  target='_blank'
+                  rel='noopener noreferrer'
+                  className='text-blue-600 hover:text-blue-800 mx-1'
+                >
+                  {t('隐私政策')}
+                </a>
+              </>
+            )}
+          </Text>
+        </Checkbox>
+        {showTermsPrompt && !agreedToTerms && (
+          <div className='legal-consent-message' role='alert'>
+            {t('请先阅读并同意用户协议和隐私政策')}
+          </div>
+        )}
+      </div>
+    );
+  };
+
   const onWeChatLoginClicked = () => {
+    if (!ensureTermsAgreement()) return;
     setWechatLoading(true);
     setShowWeChatLoginModal(true);
     setWechatLoading(false);
@@ -216,6 +293,7 @@ const RegisterForm = () => {
   }
 
   async function handleSubmit(e) {
+    if (!ensureTermsAgreement()) return;
     if (password.length < 8) {
       showInfo('密码长度不得小于 8 位！');
       return;
@@ -280,6 +358,7 @@ const RegisterForm = () => {
   };
 
   const handleGitHubClick = () => {
+    if (!ensureTermsAgreement()) return;
     if (githubButtonDisabled) {
       return;
     }
@@ -302,6 +381,7 @@ const RegisterForm = () => {
   };
 
   const handleDiscordClick = () => {
+    if (!ensureTermsAgreement()) return;
     setDiscordLoading(true);
     try {
       onDiscordOAuthClicked(status.discord_client_id, { shouldLogout: true });
@@ -311,6 +391,7 @@ const RegisterForm = () => {
   };
 
   const handleOIDCClick = () => {
+    if (!ensureTermsAgreement()) return;
     setOidcLoading(true);
     try {
       onOIDCClicked(
@@ -325,6 +406,7 @@ const RegisterForm = () => {
   };
 
   const handleLinuxDOClick = () => {
+    if (!ensureTermsAgreement()) return;
     setLinuxdoLoading(true);
     try {
       onLinuxDOOAuthClicked(status.linuxdo_client_id, { shouldLogout: true });
@@ -334,6 +416,7 @@ const RegisterForm = () => {
   };
 
   const handleCustomOAuthClick = (provider) => {
+    if (!ensureTermsAgreement()) return;
     setCustomOAuthLoading((prev) => ({ ...prev, [provider.slug]: true }));
     try {
       onCustomOAuthClicked(provider, { shouldLogout: true });
@@ -345,6 +428,7 @@ const RegisterForm = () => {
   };
 
   const handleEmailRegisterClick = () => {
+    if (!ensureTermsAgreement()) return;
     setEmailRegisterLoading(true);
     setShowEmailRegister(true);
     setEmailRegisterLoading(false);
@@ -357,6 +441,7 @@ const RegisterForm = () => {
   };
 
   const onTelegramLoginClicked = async (response) => {
+    if (!ensureTermsAgreement()) return;
     const fields = [
       'id',
       'first_name',
@@ -536,6 +621,8 @@ const RegisterForm = () => {
                 </Button>
               </div>
 
+              {renderTermsConsent('mt-6')}
+
               <div className='mt-6 text-center text-sm'>
                 <Text>
                   {t('已有账户？')}{' '}
@@ -637,43 +724,7 @@ const RegisterForm = () => {
                   </>
                 )}
 
-                {(hasUserAgreement || hasPrivacyPolicy) && (
-                  <div className='pt-4'>
-                    <Checkbox
-                      checked={agreedToTerms}
-                      onChange={(e) => setAgreedToTerms(e.target.checked)}
-                    >
-                      <Text size='small' className='text-gray-600'>
-                        {t('我已阅读并同意')}
-                        {hasUserAgreement && (
-                          <>
-                            <a
-                              href='/user-agreement'
-                              target='_blank'
-                              rel='noopener noreferrer'
-                              className='text-blue-600 hover:text-blue-800 mx-1'
-                            >
-                              {t('用户协议')}
-                            </a>
-                          </>
-                        )}
-                        {hasUserAgreement && hasPrivacyPolicy && t('和')}
-                        {hasPrivacyPolicy && (
-                          <>
-                            <a
-                              href='/privacy-policy'
-                              target='_blank'
-                              rel='noopener noreferrer'
-                              className='text-blue-600 hover:text-blue-800 mx-1'
-                            >
-                              {t('隐私政策')}
-                            </a>
-                          </>
-                        )}
-                      </Text>
-                    </Checkbox>
-                  </div>
-                )}
+                {renderTermsConsent('mt-4')}
 
                 <div className='space-y-2 pt-2'>
                   <Button
@@ -683,9 +734,7 @@ const RegisterForm = () => {
                     htmlType='submit'
                     onClick={handleSubmit}
                     loading={registerLoading}
-                    disabled={
-                      (hasUserAgreement || hasPrivacyPolicy) && !agreedToTerms
-                    }
+                    disabled={registerLoading}
                   >
                     {t('注册')}
                   </Button>
