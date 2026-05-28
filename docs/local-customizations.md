@@ -40,9 +40,9 @@ This file records local product customizations that must be preserved when mergi
 
 ### 2026-05-26 — Default Theme Quick Exchange And Hover Contact
 
-**Behavior to preserve:** The default home page must expose quick redemption and customer-service contact actions for both logged-in and logged-out users. Quick redemption posts to the local Go backend `/api/quick_exchange`, creates or reuses the derived account from the redemption code prefix, redeems the code, returns the API key and same-origin Base URL values, and points users to Model Square for model selection instead of hard-coding recommended models.
+**Behavior to preserve:** The default home page must expose quick redemption and customer-service contact actions for both logged-in and logged-out users. Quick redemption posts to the local Go backend `/api/quick_exchange`, creates or reuses the derived account from the redemption code prefix, redeems the code, returns the API key and same-origin Base URL values, and points users to Model Square for model selection instead of hard-coding recommended models. The quick-exchange dialog must warn that Quick Exchange is for first-time setup and generates a new account; users who want to recharge an existing account should sign in to that account and redeem from Wallet instead.
 
-All default-theme WeChat customer-service buttons/links touched by this customization must show the QR code in-place on hover/focus/click and must not navigate to a new tab. The popover must show the WeChat ID `deepseek998877`, QR code, and a copy button.
+All default-theme WeChat customer-service buttons/links touched by this customization must show the QR code in-place on hover/focus/click and must not navigate to a new tab. The popover must show the WeChat ID `deepseek998877`, QR code, and a copy button. Home-page and header customer-service entries must close immediately when the pointer leaves the trigger, avoiding delayed close flicker.
 
 **Affected files:**
 
@@ -57,6 +57,7 @@ All default-theme WeChat customer-service buttons/links touched by this customiz
 - `web/default/src/features/home/types.ts`
 - `web/default/src/features/home/components/quick-exchange-dialog.tsx`
 - `web/default/src/features/home/components/sections/hero.tsx`
+- `web/classic/src/pages/Home/index.jsx`
 - `web/default/src/features/pricing/index.tsx`
 - `web/default/src/features/usage-logs/components/common-logs-filter-bar.tsx`
 - `web/classic/src/components/layout/headerbar/Navigation.jsx`
@@ -74,6 +75,7 @@ All default-theme WeChat customer-service buttons/links touched by this customiz
 - Preserve `middleware.CriticalRateLimit()` on the public quick-exchange route.
 - Preserve idempotency for already-used redemption codes when `UsedUserId` matches the derived account.
 - If upstream changes home, pricing, usage logs, or navigation contact UI, keep customer-service QR behavior in-place instead of link navigation.
+- Keep the home page “More Apps” support entry in both themes linked to `https://silra.apifox.cn/doc-8206391` in a new tab.
 - Classic usage logs and header contact entries are included because the platform-wide customer-service behavior must not open QR links in a new browser tab.
 
 **Validation:**
@@ -116,7 +118,7 @@ All default-theme WeChat customer-service buttons/links touched by this customiz
 
 ### 2026-05-25 — Default Theme Header Contact And 404 Redirect
 
-**Behavior to preserve:** The default frontend theme header navigation must include a customer-service contact entry. The entry opens the WeChat support QR code and reminds users to include the username shown in the upper-right corner when consulting support.
+**Behavior to preserve:** The default frontend theme header navigation must include a customer-service contact entry. The entry opens the WeChat support QR code, reminds users to include the username shown in the upper-right corner when consulting support, and closes immediately when the pointer leaves the contact trigger.
 
 QR code URL:
 
@@ -147,6 +149,7 @@ The default theme 404 page must show an auto-redirect notice with a visible coun
 
 - Keep `contact: true` in the default header navigation configuration so existing deployments that lack this key still show the contact entry.
 - Preserve QR hover behavior on desktop and click-through access on mobile.
+- Do not reintroduce delayed hover-close behavior that can make the QR popover flicker after the pointer leaves the contact entry.
 - Keep the 404 redirect delay at 5 seconds unless product requirements change.
 
 **Validation:**
@@ -240,7 +243,7 @@ The notice must include a close control so users can hide it locally in both fro
 
 ### 2026-04-23 — Header Customer Service QR Entry
 
-**Behavior to preserve:** Classic header navigation has a customer-service/contact entry that opens the WeChat support QR code. The popover text should remind users to include the username shown in the upper-right corner when consulting support.
+**Behavior to preserve:** Classic header navigation has a customer-service/contact entry that opens the WeChat support QR code and closes immediately when the pointer leaves the contact trigger. The popover text should remind users to include the username shown in the upper-right corner when consulting support.
 
 QR code URL:
 
@@ -254,6 +257,7 @@ QR code URL:
 **Upstream merge notes:**
 
 - Preserve the final hover-trigger popover behavior from `e95261ec7`; do not restore the custom controlled-popover state that made the QR hard to close.
+- Clicks on the classic contact entry should toggle the popover instead of leaving it stuck open.
 - Keep passing `t` from the header bar into `Navigation`; this also prevents the classic homepage/header blank-screen regression fixed by `4b37a4cb5`.
 
 **Validation:**

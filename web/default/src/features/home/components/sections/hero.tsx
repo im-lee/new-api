@@ -92,7 +92,10 @@ export function Hero(props: HeroProps) {
   )
 
   const contactButton = (
-    <WeChatSupportPopover className='border-border/50 hover:border-border hover:bg-muted/50 h-11 rounded-lg px-5 text-sm font-medium'>
+    <WeChatSupportPopover
+      className='border-border/50 hover:border-border hover:bg-muted/50 h-11 rounded-lg px-5 text-sm font-medium'
+      closeOnTriggerLeave
+    >
       <MessageCircle className='size-4' />
       {t('Contact customer service')}
     </WeChatSupportPopover>
@@ -236,10 +239,15 @@ export function Hero(props: HeroProps) {
                 </span>
                 <span>CC Switch</span>
               </a>
-              <div className='group border-border/40 bg-muted/15 text-foreground/55 hover:border-border hover:bg-muted/30 hover:text-foreground flex cursor-default items-center gap-2.5 rounded-full border px-5 py-2.5 text-sm font-medium shadow-[0_1px_2.5px_rgba(0,0,0,0.01)] backdrop-blur-xs transition-all duration-300 hover:scale-[1.02]'>
+              <a
+                href='https://silra.apifox.cn/doc-8206391'
+                target='_blank'
+                rel='noopener noreferrer'
+                className='group border-border/40 bg-muted/15 text-foreground/55 hover:border-border hover:bg-muted/30 hover:text-foreground flex items-center gap-2.5 rounded-full border px-5 py-2.5 text-sm font-medium shadow-[0_1px_2.5px_rgba(0,0,0,0.01)] backdrop-blur-xs transition-all duration-300 hover:scale-[1.02]'
+              >
                 <MoreIcon />
                 <span>{t('More Apps')}</span>
-              </div>
+              </a>
             </div>
           </div>
         </div>

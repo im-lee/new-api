@@ -76,7 +76,11 @@ const Navigation = ({
               onMouseLeave={() => setVisibleContactKey(null)}
               onFocus={() => setVisibleContactKey(link.itemKey)}
               onBlur={() => setVisibleContactKey(null)}
-              onClick={() => setVisibleContactKey(link.itemKey)}
+              onClick={() =>
+                setVisibleContactKey((current) =>
+                  current === link.itemKey ? null : link.itemKey,
+                )
+              }
             >
               {linkContent}
             </button>

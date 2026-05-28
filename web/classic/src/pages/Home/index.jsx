@@ -287,11 +287,16 @@ const Home = () => {
                     <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
                       <Xinference.Color size={40} />
                     </div>
-                    <div className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'>
+                    <a
+                      href='https://silra.apifox.cn/doc-8206391'
+                      target='_blank'
+                      rel='noopener noreferrer'
+                      className='w-8 h-8 sm:w-10 sm:h-10 md:w-12 md:h-12 flex items-center justify-center'
+                    >
                       <Typography.Text className='!text-lg sm:!text-xl md:!text-2xl lg:!text-3xl font-bold'>
                         10+
                       </Typography.Text>
-                    </div>
+                    </a>
                   </div>
                 </div>
               </div>

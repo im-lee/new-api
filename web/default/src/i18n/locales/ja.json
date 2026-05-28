@@ -3151,6 +3151,7 @@
     "Quick actions": "クイック操作",
     "Quick Exchange": "クイック交換",
     "Quick exchange failed.": "クイック交換に失敗しました。",
+    "Quick Exchange is intended for first-time setup and will generate a new account. To recharge an existing account, sign in to that account and redeem the code from Wallet instead.": "クイック交換は初回セットアップ向けで、新しいアカウントを生成します。既存アカウントへチャージする場合は、そのアカウントにサインインしてウォレットからコードを交換してください。",
     "Quick insert common payment methods": "一般的な支払い方法をすばやく挿入",
     "Quick Range": "クイック範囲",
     "Quick Setup from Preset": "プリセットからクイックセットアップ",

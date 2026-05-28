@@ -39,6 +39,7 @@ type WeChatSupportPopoverProps = {
   buttonVariant?: React.ComponentProps<typeof Button>['variant']
   buttonSize?: React.ComponentProps<typeof Button>['size']
   showReminder?: boolean
+  closeOnTriggerLeave?: boolean
 }
 
 export function WeChatSupportPopover({
@@ -49,6 +50,7 @@ export function WeChatSupportPopover({
   buttonVariant = 'outline',
   buttonSize = 'default',
   showReminder = false,
+  closeOnTriggerLeave = false,
 }: WeChatSupportPopoverProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
@@ -68,6 +70,10 @@ export function WeChatSupportPopover({
 
   const scheduleClose = () => {
     clearCloseTimer()
+    if (closeOnTriggerLeave) {
+      setOpen(false)
+      return
+    }
     closeTimer.current = window.setTimeout(() => setOpen(false), 120)
   }
 
@@ -97,8 +103,8 @@ export function WeChatSupportPopover({
       </PopoverTrigger>
       <PopoverContent
         className={cn('w-56 p-3 text-center', contentClassName)}
-        onMouseEnter={openPopover}
-        onMouseLeave={scheduleClose}
+        onMouseEnter={closeOnTriggerLeave ? undefined : openPopover}
+        onMouseLeave={closeOnTriggerLeave ? undefined : scheduleClose}
       >
         <div className='space-y-2'>
           {showReminder && (

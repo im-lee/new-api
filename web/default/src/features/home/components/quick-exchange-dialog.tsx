@@ -123,9 +123,16 @@ export function QuickExchangeDialog({
         {!result ? (
           <form className='space-y-4' onSubmit={handleSubmit}>
             <div className='rounded-lg border border-amber-300/70 bg-amber-50/90 px-3 py-2.5 text-sm leading-6 text-amber-950 dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100'>
-              {t(
-                'The system uses the first 10 characters of the redemption code as the account username and password.'
-              )}
+              <p>
+                {t(
+                  'Quick Exchange is intended for first-time setup and will generate a new account. To recharge an existing account, sign in to that account and redeem the code from Wallet instead.'
+                )}
+              </p>
+              <p className='mt-1'>
+                {t(
+                  'The system uses the first 10 characters of the redemption code as the account username and password.'
+                )}
+              </p>
               {derivedAccount && (
                 <div className='mt-1 text-xs'>
                   {t('Account preview: {{account}}', {

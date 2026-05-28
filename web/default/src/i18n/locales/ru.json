@@ -3151,6 +3151,7 @@
     "Quick actions": "Быстрые действия",
     "Quick Exchange": "Быстрый обмен",
     "Quick exchange failed.": "Быстрый обмен не удался.",
+    "Quick Exchange is intended for first-time setup and will generate a new account. To recharge an existing account, sign in to that account and redeem the code from Wallet instead.": "Быстрый обмен предназначен для первого запуска и создаст новую учетную запись. Чтобы пополнить существующую учетную запись, войдите в нее и активируйте код в кошельке.",
     "Quick insert common payment methods": "Быстрая вставка распространенных способов оплаты",
     "Quick Range": "Быстрый диапазон",
     "Quick Setup from Preset": "Быстрая настройка из предустановки",

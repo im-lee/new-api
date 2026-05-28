@@ -3151,6 +3151,7 @@
     "Quick actions": "快捷操作",
     "Quick Exchange": "快捷兑换",
     "Quick exchange failed.": "快捷兑换失败。",
+    "Quick Exchange is intended for first-time setup and will generate a new account. To recharge an existing account, sign in to that account and redeem the code from Wallet instead.": "快捷兑换通常用于首次开通，会生成一个新账号。如需充值到已有账号，请先登录原账号，再到钱包中兑换充值码。",
     "Quick insert common payment methods": "快速插入常用支付方式",
     "Quick Range": "快速范围",
     "Quick Setup from Preset": "从预设快速设置",

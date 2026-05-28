@@ -3151,6 +3151,7 @@
     "Quick actions": "Actions rapides",
     "Quick Exchange": "Échange rapide",
     "Quick exchange failed.": "Échec de l’échange rapide.",
+    "Quick Exchange is intended for first-time setup and will generate a new account. To recharge an existing account, sign in to that account and redeem the code from Wallet instead.": "L’échange rapide est destiné à une première configuration et génère un nouveau compte. Pour recharger un compte existant, connectez-vous à ce compte et utilisez le code depuis le portefeuille.",
     "Quick insert common payment methods": "Insérer rapidement les méthodes de paiement courantes",
     "Quick Range": "Plage rapide",
     "Quick Setup from Preset": "Configuration rapide à partir d'un préréglage",

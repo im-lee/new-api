@@ -41,6 +41,7 @@ export function CustomerServiceNavLink({
       unstyled
       className={className}
       showReminder
+      closeOnTriggerLeave
     >
       {title}
     </WeChatSupportPopover>
