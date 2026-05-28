@@ -16,8 +16,9 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { type ReactNode, useRef, useState } from 'react'
+import { type ReactNode, useState } from 'react'
 import { useTranslation } from 'react-i18next'
+import { X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 import {
   CUSTOMER_SERVICE_QR_CODE_URL,
@@ -39,7 +40,6 @@ type WeChatSupportPopoverProps = {
   buttonVariant?: React.ComponentProps<typeof Button>['variant']
   buttonSize?: React.ComponentProps<typeof Button>['size']
   showReminder?: boolean
-  closeOnTriggerLeave?: boolean
 }
 
 export function WeChatSupportPopover({
@@ -50,32 +50,9 @@ export function WeChatSupportPopover({
   buttonVariant = 'outline',
   buttonSize = 'default',
   showReminder = false,
-  closeOnTriggerLeave = false,
 }: WeChatSupportPopoverProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
-  const closeTimer = useRef<number | null>(null)
-
-  const clearCloseTimer = () => {
-    if (closeTimer.current !== null) {
-      window.clearTimeout(closeTimer.current)
-      closeTimer.current = null
-    }
-  }
-
-  const openPopover = () => {
-    clearCloseTimer()
-    setOpen(true)
-  }
-
-  const scheduleClose = () => {
-    clearCloseTimer()
-    if (closeOnTriggerLeave) {
-      setOpen(false)
-      return
-    }
-    closeTimer.current = window.setTimeout(() => setOpen(false), 120)
-  }
 
   const trigger = unstyled ? (
     <button
@@ -88,30 +65,21 @@ export function WeChatSupportPopover({
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger
-        render={trigger}
-        onMouseEnter={openPopover}
-        onMouseLeave={scheduleClose}
-        onFocus={openPopover}
-        onBlur={scheduleClose}
-        onClick={(event) => {
-          event.preventDefault()
-          setOpen(true)
-        }}
-      >
+      <PopoverTrigger render={trigger}>
         {children ?? t('Contact customer service')}
       </PopoverTrigger>
       <PopoverContent
-        className={cn(
-          'w-56 p-3 text-center',
-          closeOnTriggerLeave &&
-            '[@media(hover:hover)]:pointer-events-none',
-          contentClassName
-        )}
-        onMouseEnter={closeOnTriggerLeave ? undefined : openPopover}
-        onMouseLeave={closeOnTriggerLeave ? undefined : scheduleClose}
+        className={cn('relative w-56 p-3 text-center', contentClassName)}
       >
-        <div className='space-y-2'>
+        <button
+          type='button'
+          aria-label={t('Close')}
+          className='text-muted-foreground hover:text-foreground focus-visible:ring-ring absolute top-2 right-2 inline-flex size-7 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none'
+          onClick={() => setOpen(false)}
+        >
+          <X className='size-4' />
+        </button>
+        <div className='space-y-2 pr-5'>
           {showReminder && (
             <p className='text-sm font-medium'>
               {t(

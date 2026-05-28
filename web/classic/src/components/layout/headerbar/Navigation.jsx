@@ -19,7 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 
 import React from 'react';
 import { Link } from 'react-router-dom';
-import { Popover } from '@douyinfe/semi-ui';
+import { Button, Popover } from '@douyinfe/semi-ui';
+import { IconClose } from '@douyinfe/semi-icons';
 import SkeletonWrapper from '../components/SkeletonWrapper';
 
 const CONTACT_QR_CODE_URL =
@@ -57,7 +58,16 @@ const Navigation = ({
               setVisibleContactKey(visible ? link.itemKey : null);
             }}
             content={
-              <div className='p-2 text-center'>
+              <div className='relative p-2 pr-8 text-center'>
+                <Button
+                  theme='borderless'
+                  type='tertiary'
+                  size='small'
+                  icon={<IconClose />}
+                  aria-label={t('关闭')}
+                  className='!absolute !right-0 !top-0'
+                  onClick={() => setVisibleContactKey(null)}
+                />
                 <div className='mb-2 text-sm text-semi-color-text-0 whitespace-normal'>
                   {t('问题咨询请备注右上角用户名')}
                 </div>
@@ -72,10 +82,6 @@ const Navigation = ({
             <button
               type='button'
               className={`${commonLinkClasses} bg-transparent border-0 cursor-pointer`}
-              onMouseEnter={() => setVisibleContactKey(link.itemKey)}
-              onMouseLeave={() => setVisibleContactKey(null)}
-              onFocus={() => setVisibleContactKey(link.itemKey)}
-              onBlur={() => setVisibleContactKey(null)}
               onClick={() =>
                 setVisibleContactKey((current) =>
                   current === link.itemKey ? null : link.itemKey,

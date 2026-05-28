@@ -94,7 +94,6 @@ export function Hero(props: HeroProps) {
   const contactButton = (
     <WeChatSupportPopover
       className='border-border/50 hover:border-border hover:bg-muted/50 h-11 rounded-lg px-5 text-sm font-medium'
-      closeOnTriggerLeave
     >
       <MessageCircle className='size-4' />
       {t('Contact customer service')}

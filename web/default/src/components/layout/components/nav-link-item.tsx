@@ -37,12 +37,7 @@ export function CustomerServiceNavLink({
   className,
 }: CustomerServiceNavLinkProps) {
   return (
-    <WeChatSupportPopover
-      unstyled
-      className={className}
-      showReminder
-      closeOnTriggerLeave
-    >
+    <WeChatSupportPopover unstyled className={className} showReminder>
       {title}
     </WeChatSupportPopover>
   )
