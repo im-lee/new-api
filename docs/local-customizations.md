@@ -514,3 +514,23 @@ QR code URL:
 
 - Use a tiered billing expression with non-ASCII labels.
 - Verify usage-log details highlight only the actually matched tier.
+
+### 2026-05-29 — Hide Wallet Referral Entry Cards
+
+**Behavior to preserve:** The wallet/top-up pages must not show the referral/invitation reward entry cards to end users. Keep existing transfer dialog and related backend flows intact; only the visible wallet-page entry points are hidden.
+
+**Affected files:**
+
+- `web/default/src/features/wallet/index.tsx`
+- `web/classic/src/components/topup/index.jsx`
+
+**Upstream merge notes:**
+
+- In the default theme, keep `AffiliateRewardsCard` out of the wallet page render tree.
+- In the classic theme, keep `InvitationCard` out of the top-up page render tree.
+- Do not remove the affiliate transfer dialog or backend API handlers unless the product decision changes.
+
+**Validation:**
+
+- Open the wallet/top-up page in both themes and confirm referral/invitation cards are absent.
+- Confirm normal recharge, redemption, subscription and billing-history entry points still render.
