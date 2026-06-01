@@ -534,3 +534,25 @@ QR code URL:
 
 - Open the wallet/top-up page in both themes and confirm referral/invitation cards are absent.
 - Confirm normal recharge, redemption, subscription and billing-history entry points still render.
+
+### 2026-06-01 — Default Wallet Email Binding Reminder
+
+**Behavior to preserve:** The default theme wallet page shows an email binding reminder when the user has more than 10 display-currency units of balance and no bound email. The primary action must redirect to `https://api.silra.cn/profile`.
+
+**Affected files:**
+
+- `web/default/src/features/wallet/index.tsx`
+- `web/default/src/features/wallet/types.ts`
+- `web/default/src/i18n/locales/*.json`
+
+**Upstream merge notes:**
+
+- Preserve the same threshold semantics as the classic theme: convert raw quota to the configured display amount before comparing with `10`.
+- Keep the dialog scoped to the default wallet page and avoid changing backend user data shape beyond the optional email field typing.
+- Keep the bind action target as `https://api.silra.cn/profile` unless product configuration changes.
+
+**Validation:**
+
+- Enter the default wallet page with balance display amount greater than 10 and no email; confirm the reminder opens.
+- Click the bind action and confirm it navigates to `https://api.silra.cn/profile`.
+- Enter with a bound email or balance at/below 10; confirm no reminder opens.

@@ -19,8 +19,19 @@ For commercial licensing, please contact support@quantumnous.com
 import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { getSelf } from '@/lib/api'
+import { quotaUnitsToDollars } from '@/lib/format'
 import { useStatus } from '@/hooks/use-status'
 import { useSystemConfig } from '@/hooks/use-system-config'
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from '@/components/ui/alert-dialog'
 import { SectionPageLayout } from '@/components/layout'
 import { AffiliateRewardsCard } from './components/affiliate-rewards-card'
 import { BillingHistoryDialog } from './components/dialogs/billing-history-dialog'
@@ -56,7 +67,20 @@ interface WalletProps {
   initialShowHistory?: boolean
 }
 
+const EMAIL_BIND_REMINDER_THRESHOLD = 10
+const EMAIL_BIND_PROFILE_URL = 'https://api.silra.cn/profile'
 const SHOW_AFFILIATE_REWARDS_CARD = false
+
+function shouldShowEmailBindReminder(user: UserWalletData | null): boolean {
+  const balanceAmount = quotaUnitsToDollars(user?.quota ?? 0)
+  const hasBoundEmail = Boolean(user?.email?.trim())
+
+  return (
+    Number.isFinite(balanceAmount) &&
+    balanceAmount > EMAIL_BIND_REMINDER_THRESHOLD &&
+    !hasBoundEmail
+  )
+}
 
 export function Wallet(props: WalletProps) {
   const { t } = useTranslation()
@@ -70,6 +94,7 @@ export function Wallet(props: WalletProps) {
   const [confirmDialogOpen, setConfirmDialogOpen] = useState(false)
   const [transferDialogOpen, setTransferDialogOpen] = useState(false)
   const [billingDialogOpen, setBillingDialogOpen] = useState(false)
+  const [emailBindReminderOpen, setEmailBindReminderOpen] = useState(false)
   const [redemptionCode, setRedemptionCode] = useState('')
   const [creemDialogOpen, setCreemDialogOpen] = useState(false)
   const [selectedCreemProduct, setSelectedCreemProduct] =
@@ -111,7 +136,9 @@ export function Wallet(props: WalletProps) {
       setUserLoading(true)
       const response = await getSelf()
       if (response.success && response.data) {
-        setUser(response.data as UserWalletData)
+        const userData = response.data as UserWalletData
+        setUser(userData)
+        setEmailBindReminderOpen(shouldShowEmailBindReminder(userData))
       }
     } catch (error) {
       // eslint-disable-next-line no-console
@@ -259,6 +286,10 @@ export function Wallet(props: WalletProps) {
     []
   )
 
+  const handleGoBindEmail = () => {
+    window.location.href = EMAIL_BIND_PROFILE_URL
+  }
+
   return (
     <>
       <SectionPageLayout>
@@ -356,6 +387,28 @@ export function Wallet(props: WalletProps) {
         open={billingDialogOpen}
         onOpenChange={setBillingDialogOpen}
       />
+
+      <AlertDialog
+        open={emailBindReminderOpen}
+        onOpenChange={setEmailBindReminderOpen}
+      >
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>{t('Bind Email Reminder')}</AlertDialogTitle>
+            <AlertDialogDescription>
+              {t(
+                'For the security of your account assets, we recommend binding an email address.'
+              )}
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>{t('Cancel')}</AlertDialogCancel>
+            <AlertDialogAction onClick={handleGoBindEmail}>
+              {t('Bind Email')}
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
       <CreemConfirmDialog
         open={creemDialogOpen}
