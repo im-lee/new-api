@@ -19,13 +19,8 @@ For commercial licensing, please contact support@quantumnous.com
 
 import react from '@vitejs/plugin-react';
 import { defineConfig, transformWithEsbuild } from 'vite';
-import pkg from '@douyinfe/vite-plugin-semi';
 import path from 'path';
 import { codeInspectorPlugin } from 'code-inspector-plugin';
-const { vitePluginSemi } = pkg;
-const semiThemeDefaultPath = path
-  .resolve(__dirname, '../node_modules/@douyinfe/semi-theme-default')
-  .replace(/\\/g, '/');
 
 // https://vitejs.dev/config/
 export default defineConfig({
@@ -54,10 +49,6 @@ export default defineConfig({
       },
     },
     react(),
-    vitePluginSemi({
-      cssLayer: true,
-      theme: semiThemeDefaultPath,
-    }),
   ],
   optimizeDeps: {
     force: true,

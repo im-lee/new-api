@@ -10,7 +10,6 @@
       "version": "0.1.0",
       "dependencies": {
         "@douyinfe/semi-icons": "^2.63.1",
-        "@douyinfe/semi-theme-default": "2.99.3",
         "@douyinfe/semi-ui": "^2.69.1",
         "@lobehub/icons": "catalog:",
         "@visactor/react-vchart": "~1.8.8",
@@ -48,7 +47,6 @@
         "use-debounce": "^10.0.4",
       },
       "devDependencies": {
-        "@douyinfe/vite-plugin-semi": "^2.74.0-alpha.6",
         "@so1ve/prettier-config": "^3.1.0",
         "@vitejs/plugin-react": "^4.2.1",
         "autoprefixer": "^10.4.21",
