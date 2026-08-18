@@ -11,6 +11,35 @@ This file records local product customizations that must be preserved when mergi
 
 ## Entries
 
+### 2026-08-18 — Upstream Frontend Flattening And Classic Retirement
+
+**Behavior to preserve:** Follow upstream's single-frontend architecture: `web/classic/` is retired and the former `web/default/` application lives directly under `web/`. Every still-applicable local product customization must remain in `web/`; Classic-only business behavior must be migrated instead of silently dropped.
+
+**Migrated behavior:**
+
+- Customer-service QR/contact UI, quick exchange, public-home provider policy, usage-log retention notice, model-support notice, model-ratio visibility policy, API-key auto-group defaults, 404 redirect, tiered-billing display fixes, and cache-token totals remain in `web/`.
+- Successful login flows default to `/chat/0`, the native equivalent of the former Classic `/console/chat/0` target, while preserving validated explicit redirect parameters.
+- The wallet page shows the former Classic email-binding reminder when the refreshed displayed balance exceeds `10` and the account has no bound email; its action routes to `/profile`.
+
+**Affected areas:**
+
+- `web/src/**`
+- `web/src/i18n/locales/*.json`
+- `AGENTS.md`
+
+**Upstream merge notes:**
+
+- Do not restore `web/classic/` or `web/default/`.
+- Historical entries below retain their original paths for provenance; resolve them against their `web/src/` equivalents.
+- If an old entry mentions both themes, its surviving behavior applies to the single `web/` frontend.
+
+**Validation:**
+
+- `cd web && bun run i18n:sync`
+- `cd web && bun run test`
+- `cd web && bun run build:check`
+- `go test ./...`
+
 ### 2026-05-26 — Default Theme Quick Exchange And Hover Contact
 
 **Behavior to preserve:** The default home page must expose quick redemption and customer-service contact actions for both logged-in and logged-out users. Quick redemption posts to the local Go backend `/api/quick_exchange`, creates or reuses the derived account from the redemption code prefix, redeems the code, returns the API key and same-origin Base URL values, and points users to Model Square for model selection instead of hard-coding recommended models.

@@ -33,10 +33,9 @@ types/         — Type definitions (relay formats, file sources, errors)
 i18n/          — Backend internationalization (go-i18n, en/zh)
 oauth/         — OAuth provider implementations
 pkg/           — Internal packages (cachex, ionet)
-web/             — Frontend themes container
- web/default/   — Default frontend (React 19, Rsbuild, Base UI, Tailwind)
-  web/classic/   — Classic frontend (React 18, Vite, Semi Design)
-  web/default/src/i18n/ — Frontend internationalization (i18next, zh/en/fr/ru/ja/vi)
+relaykit/      — Standalone protocol-conversion Go module
+web/           — Frontend (React 19, Rsbuild, Base UI, Tailwind)
+  src/i18n/    — Frontend internationalization (i18next, zh/zh-TW/en/fr/ru/ja/vi)
 ```
 
 ## Internationalization (i18n)
@@ -45,12 +44,12 @@ web/             — Frontend themes container
 - Library: `nicksnyder/go-i18n/v2`
 - Languages: en, zh
 
-### Frontend (`web/default/src/i18n/`)
+### Frontend (`web/src/i18n/`)
 - Library: `i18next` + `react-i18next` + `i18next-browser-languagedetector`
-- Languages: en (base), zh (fallback), fr, ru, ja, vi
-- Translation files: `web/default/src/i18n/locales/{lang}.json` — flat JSON, keys are English source strings
+- Languages: en (base), zh (fallback), zh-TW, fr, ru, ja, vi
+- Translation files: `web/src/i18n/locales/{lang}.json` — flat JSON, keys are English source strings
 - Usage: `useTranslation()` hook, call `t('English key')` in components
-- CLI tools: `bun run i18n:sync` (from `web/default/`)
+- CLI tools: `bun run i18n:sync` (from `web/`)
 
 ## Rules
 
@@ -66,10 +65,17 @@ This repository carries local product customizations on top of upstream code. Pr
   - affected area and files;
   - what behavior must be preserved;
   - upstream-merge notes and validation commands.
-- For frontend-visible changes, check both themes unless the user explicitly names only one:
-  - `web/default` (React 19, Rsbuild, Base UI, Tailwind);
-  - `web/classic` (React 18, Vite, Semi Design).
-- Frontend i18n must be updated in the matching locale system for every touched theme.
+- The upstream Classic frontend was retired on 2026-07-20. Preserve all still-applicable local product behavior in the single `web/` frontend.
+- Frontend i18n must be updated for every supported locale for each user-facing change.
+
+### Common Code Quality
+
+- Prefer early returns, clear branches, and well-named local variables over deep nesting.
+- Avoid adding single-use package/module helpers unless they express a stable business concept or deserve direct tests.
+
+### RelayKit Independence
+
+The `relaykit/` Go module must remain independently buildable and must not import packages from the root module. Validate changes with `cd relaykit && GOWORK=off go build ./...`.
 
 ### Rule 1: JSON Package — Use `common/json.go`
 
@@ -111,7 +117,7 @@ All database code MUST be fully compatible with all three databases simultaneous
 
 ### Rule 3: Frontend — Prefer Bun
 
-Use `bun` as the preferred package manager and script runner for the frontend (`web/default/` directory):
+Use `bun` as the preferred package manager and script runner for the frontend (`web/` directory):
 - `bun install` for dependency installation
 - `bun run dev` for development server
 - `bun run build` for production build
