@@ -16,6 +16,7 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
+import { useEffect, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Checkbox } from '@/components/ui/checkbox'
@@ -29,6 +30,8 @@ interface LegalConsentProps {
   checked: boolean
   onCheckedChange: (nextValue: boolean) => void
   className?: string
+  attentionCount?: number
+  showAttentionMessage?: boolean
 }
 
 export function LegalConsent({
@@ -36,23 +39,46 @@ export function LegalConsent({
   checked,
   onCheckedChange,
   className,
+  attentionCount = 0,
+  showAttentionMessage = false,
 }: LegalConsentProps) {
   const { t } = useTranslation()
+  const [isAttentionActive, setIsAttentionActive] = useState(false)
   const hasUserAgreement = Boolean(status?.user_agreement_enabled)
   const hasPrivacyPolicy = Boolean(status?.privacy_policy_enabled)
+
+  useEffect(() => {
+    if (attentionCount === 0) return
+
+    setIsAttentionActive(false)
+    const startTimer = window.setTimeout(() => setIsAttentionActive(true), 0)
+    const endTimer = window.setTimeout(() => setIsAttentionActive(false), 650)
+
+    return () => {
+      window.clearTimeout(startTimer)
+      window.clearTimeout(endTimer)
+    }
+  }, [attentionCount])
 
   if (!hasUserAgreement && !hasPrivacyPolicy) {
     return null
   }
 
   const handleChange = (value: boolean) => {
-    onCheckedChange(value === true)
+    const nextValue = value === true
+    if (nextValue) {
+      setIsAttentionActive(false)
+    }
+    onCheckedChange(nextValue)
   }
 
   return (
     <div
       className={cn(
-        'border-border/60 bg-muted/40 flex items-start gap-3 rounded-md border p-3',
+        'border-border/60 bg-muted/40 flex items-start gap-3 rounded-md border p-3 transition-colors',
+        showAttentionMessage &&
+          'border-destructive/70 bg-destructive/5 ring-destructive/15 ring-2',
+        isAttentionActive && 'legal-consent-shake',
         className
       )}
     >
@@ -91,6 +117,11 @@ export function LegalConsent({
           )}
           .
         </span>
+        {showAttentionMessage && !checked && (
+          <p className='text-destructive mt-1 text-xs font-medium' role='alert'>
+            {t('Please agree to the legal terms first')}
+          </p>
+        )}
       </Label>
     </div>
   )

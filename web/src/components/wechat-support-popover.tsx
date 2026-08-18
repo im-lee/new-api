@@ -16,7 +16,8 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useState, type ReactNode } from 'react'
+import { X } from 'lucide-react'
+import { type ReactNode, useState } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { CopyButton } from '@/components/copy-button'
@@ -24,21 +25,21 @@ import {
   CUSTOMER_SERVICE_QR_CODE_URL,
   CUSTOMER_SERVICE_WECHAT_ID,
 } from '@/components/layout/constants'
+import { Button } from '@/components/ui/button'
 import {
   Popover,
   PopoverContent,
-  PopoverDescription,
-  PopoverHeader,
-  PopoverTitle,
   PopoverTrigger,
 } from '@/components/ui/popover'
 import { cn } from '@/lib/utils'
 
-interface WeChatSupportPopoverProps {
-  children: ReactNode
+type WeChatSupportPopoverProps = {
+  children?: ReactNode
   className?: string
   contentClassName?: string
   unstyled?: boolean
+  buttonVariant?: React.ComponentProps<typeof Button>['variant']
+  buttonSize?: React.ComponentProps<typeof Button>['size']
   showReminder?: boolean
 }
 
@@ -47,56 +48,65 @@ export function WeChatSupportPopover({
   className,
   contentClassName,
   unstyled = false,
+  buttonVariant = 'outline',
+  buttonSize = 'default',
   showReminder = false,
 }: WeChatSupportPopoverProps) {
   const { t } = useTranslation()
   const [open, setOpen] = useState(false)
 
-  const trigger = (
+  const trigger = unstyled ? (
     <button
       type='button'
-      className={cn(
-        !unstyled &&
-          'inline-flex items-center justify-center gap-2 rounded-md text-sm font-medium transition-colors disabled:pointer-events-none disabled:opacity-50',
-        className
-      )}
-      onMouseEnter={() => setOpen(true)}
-      onFocus={() => setOpen(true)}
-      onClick={() => setOpen((value) => !value)}
-    >
-      {children}
-    </button>
+      className={cn('cursor-pointer bg-transparent p-0 text-left', className)}
+    />
+  ) : (
+    <Button variant={buttonVariant} size={buttonSize} className={className} />
   )
 
   return (
     <Popover open={open} onOpenChange={setOpen}>
-      <PopoverTrigger render={trigger} />
+      <PopoverTrigger render={trigger}>
+        {children ?? t('Contact customer service')}
+      </PopoverTrigger>
       <PopoverContent
-        className={cn('w-64 gap-3 p-3', contentClassName)}
-        onMouseEnter={() => setOpen(true)}
-        onMouseLeave={() => setOpen(false)}
+        className={cn('relative w-56 p-3 text-center', contentClassName)}
       >
-        <PopoverHeader>
-          <PopoverTitle>{t('WeChat customer service')}</PopoverTitle>
-          <PopoverDescription>
-            {showReminder
-              ? t('Please include your username when consulting support.')
-              : t('Scan the QR code or copy the WeChat ID to contact support.')}
-          </PopoverDescription>
-        </PopoverHeader>
-        <img
-          src={CUSTOMER_SERVICE_QR_CODE_URL}
-          alt={t('WeChat customer service QR code')}
-          className='border-border bg-muted mx-auto size-36 rounded-md border object-cover'
-        />
-        <div className='bg-muted/50 flex items-center justify-between gap-2 rounded-md px-2 py-1.5 text-sm'>
-          <span className='text-muted-foreground'>{t('WeChat ID')}</span>
-          <span className='font-medium'>{CUSTOMER_SERVICE_WECHAT_ID}</span>
-          <CopyButton
-            value={CUSTOMER_SERVICE_WECHAT_ID}
-            size='icon-xs'
-            tooltip={t('Copy WeChat ID')}
-            successTooltip={t('Copied WeChat ID')}
+        <button
+          type='button'
+          aria-label={t('Close')}
+          className='text-muted-foreground hover:text-foreground focus-visible:ring-ring absolute top-2 right-2 inline-flex size-7 items-center justify-center rounded-md transition-colors focus-visible:ring-2 focus-visible:outline-none'
+          onClick={() => setOpen(false)}
+        >
+          <X className='size-4' />
+        </button>
+        <div className='space-y-2 pr-5'>
+          {showReminder && (
+            <p className='text-sm font-medium'>
+              {t(
+                'Please include the username shown in the upper-right corner when consulting support.'
+              )}
+            </p>
+          )}
+          <div className='flex items-center justify-center gap-1.5'>
+            <p className='text-sm font-semibold'>
+              {t('WeChat ID: {{wechatId}}', {
+                wechatId: CUSTOMER_SERVICE_WECHAT_ID,
+              })}
+            </p>
+            <CopyButton
+              value={CUSTOMER_SERVICE_WECHAT_ID}
+              size='icon-sm'
+              tooltip={t('Copy WeChat ID')}
+            />
+          </div>
+          <p className='text-muted-foreground text-xs'>
+            {t('Scan to add WeChat support')}
+          </p>
+          <img
+            src={CUSTOMER_SERVICE_QR_CODE_URL}
+            alt={t('WeChat support QR code')}
+            className='mx-auto h-40 w-40 rounded-md object-contain'
           />
         </div>
       </PopoverContent>

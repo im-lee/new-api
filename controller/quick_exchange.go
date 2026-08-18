@@ -3,6 +3,7 @@ package controller
 import (
 	"github.com/QuantumNous/new-api/common"
 	"github.com/QuantumNous/new-api/service"
+
 	"github.com/gin-gonic/gin"
 )
 
@@ -19,7 +20,7 @@ func QuickExchange(c *gin.Context) {
 
 	result, err := service.QuickExchange(req.Key, c.Request)
 	if err != nil {
-		common.ApiError(c, err)
+		common.ApiErrorMsg(c, err.Error())
 		return
 	}
 	common.ApiSuccess(c, result)

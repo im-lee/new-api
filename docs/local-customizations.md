@@ -13,38 +13,46 @@ This file records local product customizations that must be preserved when mergi
 
 ### 2026-08-18 — Upstream Frontend Flattening And Classic Retirement
 
-**Behavior to preserve:** Follow upstream's single-frontend architecture: `web/classic/` is retired and the former `web/default/` application lives directly under `web/`. Every still-applicable local product customization must remain in `web/`; Classic-only business behavior must be migrated instead of silently dropped.
+**Behavior to preserve:** Follow upstream's single-theme layout: the former `web/default` application now lives directly under `web/`, and the retired `web/classic` theme remains deleted. Every local product behavior previously implemented only in Classic must be carried into the current frontend instead of restoring Classic.
 
-**Migrated behavior:**
+**Affected files:** `web/`, `AGENTS.md`, and this ledger.
 
-- Customer-service QR/contact UI, quick exchange, public-home provider policy, usage-log retention notice, model-support notice, model-ratio visibility policy, API-key auto-group defaults, 404 redirect, tiered-billing display fixes, and cache-token totals remain in `web/`.
-- Successful login flows default to `/chat/0`, the native equivalent of the former Classic `/console/chat/0` target, while preserving validated explicit redirect parameters.
-- The wallet page shows the former Classic email-binding reminder when the refreshed displayed balance exceeds `10` and the account has no bound email; its action routes to `/profile`.
+**Upstream merge notes:** Treat older `web/default/...` ledger paths as their corresponding `web/...` paths. References to `web/classic/...` document the source of migrated behavior only and do not authorize recreating that theme.
 
-**Affected areas:**
+**Validation:** `cd web && bun run format:check && bun run test && bun run build:check`; `go test ./...`.
 
-- `web/src/**`
-- `web/src/i18n/locales/*.json`
-- `AGENTS.md`
+### 2026-05-27 — Auth Legal Consent Attention Prompt
+
+**Behavior to preserve:** When user agreement or privacy policy consent is required on login or registration, primary login/register and OAuth/passkey/WeChat actions must remain clickable enough to show feedback. If the user attempts to continue without checking consent, the consent area must visibly shake, switch to an error-highlight state, and show an inline reminder to agree before continuing. This behavior must exist in both default and classic frontend themes.
+
+**Affected files:**
+
+- `web/default/src/features/auth/components/legal-consent.tsx`
+- `web/default/src/features/auth/components/oauth-providers.tsx`
+- `web/default/src/features/auth/sign-in/components/user-auth-form.tsx`
+- `web/default/src/features/auth/sign-up/components/sign-up-form.tsx`
+- `web/default/src/styles/index.css`
+- `web/classic/src/components/auth/LoginForm.jsx`
+- `web/classic/src/components/auth/RegisterForm.jsx`
+- `web/classic/src/index.css`
 
 **Upstream merge notes:**
 
-- Do not restore `web/classic/` or `web/default/`.
-- Historical entries below retain their original paths for provenance; resolve them against their `web/src/` equivalents.
-- If an old entry mentions both themes, its surviving behavior applies to the single `web/` frontend.
+- Do not restore disabled-only behavior for legal consent. Keep the action handlers as the guard point so users receive visible guidance after clicking.
+- Keep OAuth, passkey, WeChat, username/password login, and username registration covered by the same consent prompt.
+- Preserve the reduced-motion fallback by disabling the shake animation when `prefers-reduced-motion: reduce` is active.
 
 **Validation:**
 
-- `cd web && bun run i18n:sync`
-- `cd web && bun run test`
-- `cd web && bun run build:check`
-- `go test ./...`
+- `cd web/default && bun run typecheck`
+- `cd web/default && bun run build`
+- `cd web/classic && npm run build`
 
-### 2026-05-26 — Default Theme Quick Exchange And Hover Contact
+### 2026-05-26 / 2026-05-28 — Quick Exchange And Click Contact
 
-**Behavior to preserve:** The default home page must expose quick redemption and customer-service contact actions for both logged-in and logged-out users. Quick redemption posts to the local Go backend `/api/quick_exchange`, creates or reuses the derived account from the redemption code prefix, redeems the code, returns the API key and same-origin Base URL values, and points users to Model Square for model selection instead of hard-coding recommended models.
+**Behavior to preserve:** The default home page must expose quick redemption and customer-service contact actions for both logged-in and logged-out users. Quick redemption posts to the local Go backend `/api/quick_exchange`, creates or reuses the derived account from the redemption code prefix, redeems the code, returns the API key and same-origin Base URL values, and points users to Model Square for model selection instead of hard-coding recommended models. The quick-exchange dialog must warn that Quick Exchange is for first-time setup and generates a new account; users who want to recharge an existing account should sign in to that account and redeem from Wallet instead.
 
-All default-theme WeChat customer-service buttons/links touched by this customization must show the QR code in-place on hover/focus/click and must not navigate to a new tab. The popover must show the WeChat ID `deepseek998877`, QR code, and a copy button.
+All WeChat customer-service buttons/links touched by this customization must show the QR code in-place on click and must not navigate to a new tab. Do not open or close these contact popovers on hover/focus, because hover-position feedback caused flicker in the home/header UI. The popover must include an explicit close button. The default-theme popover must show the WeChat ID `deepseek998877`, QR code, and a copy button.
 
 **Affected files:**
 
@@ -59,6 +67,7 @@ All default-theme WeChat customer-service buttons/links touched by this customiz
 - `web/default/src/features/home/types.ts`
 - `web/default/src/features/home/components/quick-exchange-dialog.tsx`
 - `web/default/src/features/home/components/sections/hero.tsx`
+- `web/classic/src/pages/Home/index.jsx`
 - `web/default/src/features/pricing/index.tsx`
 - `web/default/src/features/usage-logs/components/common-logs-filter-bar.tsx`
 - `web/classic/src/components/layout/headerbar/Navigation.jsx`
@@ -76,6 +85,8 @@ All default-theme WeChat customer-service buttons/links touched by this customiz
 - Preserve `middleware.CriticalRateLimit()` on the public quick-exchange route.
 - Preserve idempotency for already-used redemption codes when `UsedUserId` matches the derived account.
 - If upstream changes home, pricing, usage logs, or navigation contact UI, keep customer-service QR behavior in-place instead of link navigation.
+- Keep home-page and header contact popovers click-controlled only, with a visible close button; do not restore hover/focus open or hover leave close behavior.
+- Keep the home page “More Apps” support entry in both themes linked to `https://silra.apifox.cn/doc-8206391` in a new tab.
 - Classic usage logs and header contact entries are included because the platform-wide customer-service behavior must not open QR links in a new browser tab.
 
 **Validation:**
@@ -118,7 +129,7 @@ All default-theme WeChat customer-service buttons/links touched by this customiz
 
 ### 2026-05-25 — Default Theme Header Contact And 404 Redirect
 
-**Behavior to preserve:** The default frontend theme header navigation must include a customer-service contact entry. The entry opens the WeChat support QR code and reminds users to include the username shown in the upper-right corner when consulting support.
+**Behavior to preserve:** The default frontend theme header navigation must include a customer-service contact entry. The entry opens the WeChat support QR code, reminds users to include the username shown in the upper-right corner when consulting support, and closes immediately when the pointer leaves the contact trigger.
 
 QR code URL:
 
@@ -149,6 +160,7 @@ The default theme 404 page must show an auto-redirect notice with a visible coun
 
 - Keep `contact: true` in the default header navigation configuration so existing deployments that lack this key still show the contact entry.
 - Preserve QR hover behavior on desktop and click-through access on mobile.
+- Do not reintroduce delayed hover-close behavior that can make the QR popover flicker after the pointer leaves the contact entry.
 - Keep the 404 redirect delay at 5 seconds unless product requirements change.
 
 **Validation:**
@@ -158,13 +170,15 @@ The default theme 404 page must show an auto-redirect notice with a visible coun
 
 ### 2026-05-21 — Usage Logs Retention Notice
 
-**Behavior to preserve:** Usage logs pages must show a yellow notice below the quota/RPM/TPM summary and above search filters:
+**Behavior to preserve:** Usage logs pages must show a dismissible yellow notice below the quota/RPM/TPM summary and above search filters:
 
 `仅展示最近1-2周的使用记录，请自行做好全量日志留存，如有其他问题请咨询微信客服。`
 
 The `微信客服` text must show the WeChat support QR code on hover/click using:
 
 `https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png`
+
+The notice must include a close control so users can hide it locally in both frontend themes.
 
 **Affected files:**
 
@@ -191,6 +205,7 @@ The `微信客服` text must show the WeChat support QR code on hover/click usin
 - In `web/default`, the notice belongs in the common usage logs filter/header area.
 - In `web/classic`, the notice belongs in the usage logs stats/header area rendered above filters.
 - Preserve the wording `仅展示`, not `仅统计和展示`.
+- Preserve the close control when upstream changes the usage logs header/filter layout.
 
 **Validation:**
 
@@ -199,11 +214,12 @@ The `微信客服` text must show the WeChat support QR code on hover/click usin
 
 ### 2026-05-19 — Model Square Support Notice And QR Contact
 
-**Behavior to preserve:** The model square/pricing page must show a yellow support notice telling users to contact WeChat support for additional model support. The notice must expose:
+**Behavior to preserve:** The model square/pricing page must show a dismissible yellow support notice telling users to contact WeChat support for additional model support. The notice must expose:
 
 - WeChat ID: `deepseek998877`
 - QR code URL: `https://chatgpt-1305971836.cos.ap-nanjing.myqcloud.com/image.png`
 - Warning that third-party platform sales support does not handle model-support requests.
+- A close control so users can hide the notice locally in both frontend themes.
 
 **Affected files:**
 
@@ -228,6 +244,7 @@ The `微信客服` text must show the WeChat support QR code on hover/click usin
 
 - Keep the notice in both `web/default` and `web/classic` model-pricing pages.
 - Use hover on desktop and click-compatible behavior on mobile where the theme component supports it.
+- Preserve the close control when upstream changes the model square/pricing layout.
 - Do not reintroduce the reverted one-line notice from commit `708c2d4b2`; preserve the richer notice from `63870b4ed`.
 
 **Validation:**
@@ -237,7 +254,7 @@ The `微信客服` text must show the WeChat support QR code on hover/click usin
 
 ### 2026-04-23 — Header Customer Service QR Entry
 
-**Behavior to preserve:** Classic header navigation has a customer-service/contact entry that opens the WeChat support QR code. The popover text should remind users to include the username shown in the upper-right corner when consulting support.
+**Behavior to preserve:** Classic header navigation has a customer-service/contact entry that opens the WeChat support QR code and closes immediately when the pointer leaves the contact trigger. The popover text should remind users to include the username shown in the upper-right corner when consulting support.
 
 QR code URL:
 
@@ -251,6 +268,7 @@ QR code URL:
 **Upstream merge notes:**
 
 - Preserve the final hover-trigger popover behavior from `e95261ec7`; do not restore the custom controlled-popover state that made the QR hard to close.
+- Clicks on the classic contact entry should toggle the popover instead of leaving it stuck open.
 - Keep passing `t` from the header bar into `Navigation`; this also prevents the classic homepage/header blank-screen regression fixed by `4b37a4cb5`.
 
 **Validation:**
@@ -506,3 +524,45 @@ QR code URL:
 
 - Use a tiered billing expression with non-ASCII labels.
 - Verify usage-log details highlight only the actually matched tier.
+
+### 2026-05-29 — Hide Wallet Referral Entry Cards
+
+**Behavior to preserve:** The wallet/top-up pages must not show the referral/invitation reward entry cards to end users. Keep existing transfer dialog and related backend flows intact; only the visible wallet-page entry points are hidden.
+
+**Affected files:**
+
+- `web/default/src/features/wallet/index.tsx`
+- `web/classic/src/components/topup/index.jsx`
+
+**Upstream merge notes:**
+
+- In the default theme, keep `AffiliateRewardsCard` out of the wallet page render tree.
+- In the classic theme, keep `InvitationCard` out of the top-up page render tree.
+- Do not remove the affiliate transfer dialog or backend API handlers unless the product decision changes.
+
+**Validation:**
+
+- Open the wallet/top-up page in both themes and confirm referral/invitation cards are absent.
+- Confirm normal recharge, redemption, subscription and billing-history entry points still render.
+
+### 2026-06-01 — Default Wallet Email Binding Reminder
+
+**Behavior to preserve:** The default theme wallet page shows an email binding reminder when the user has more than 10 display-currency units of balance and no bound email. The primary action must redirect to `https://api.silra.cn/profile`.
+
+**Affected files:**
+
+- `web/default/src/features/wallet/index.tsx`
+- `web/default/src/features/wallet/types.ts`
+- `web/default/src/i18n/locales/*.json`
+
+**Upstream merge notes:**
+
+- Preserve the same threshold semantics as the classic theme: convert raw quota to the configured display amount before comparing with `10`.
+- Keep the dialog scoped to the default wallet page and avoid changing backend user data shape beyond the optional email field typing.
+- Keep the bind action target as `https://api.silra.cn/profile` unless product configuration changes.
+
+**Validation:**
+
+- Enter the default wallet page with balance display amount greater than 10 and no email; confirm the reminder opens.
+- Click the bind action and confirm it navigates to `https://api.silra.cn/profile`.
+- Enter with a bound email or balance at/below 10; confirm no reminder opens.
