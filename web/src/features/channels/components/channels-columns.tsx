@@ -390,7 +390,7 @@ export function BalanceCell({ channel }: { channel: Channel }) {
   const maskedUsedLabel = `${t('Used:')} ${SENSITIVE_MASK}`
   const maskedRemainingLabel = `${t('Remaining:')} ${SENSITIVE_MASK}`
 
-  // Tag row: only show cumulative used quota
+  // Tag row: show cumulative used quota and remaining balance.
   if (isTagRow) {
     return (
       <TooltipProvider>
@@ -400,8 +400,8 @@ export function BalanceCell({ channel }: { channel: Channel }) {
               <StatusBadge
                 label={
                   sensitiveVisible
-                    ? `${t('Used:')} ${usedDisplay}`
-                    : maskedUsedLabel
+                    ? `${t('Used:')} ${usedDisplay} · ${t('Remaining:')} ${remainingDisplay}`
+                    : `${maskedUsedLabel} · ${maskedRemainingLabel}`
                 }
                 variant='neutral'
                 size='sm'
@@ -413,6 +413,7 @@ export function BalanceCell({ channel }: { channel: Channel }) {
           />
           <TooltipContent>
             <p>{sensitiveVisible ? usedLabel : maskedUsedLabel}</p>
+            <p>{sensitiveVisible ? remainingLabel : maskedRemainingLabel}</p>
           </TooltipContent>
         </Tooltip>
       </TooltipProvider>

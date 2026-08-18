@@ -20,7 +20,7 @@ import { useQueryClient, useIsFetching } from '@tanstack/react-query'
 import { useNavigate, getRouteApi } from '@tanstack/react-router'
 import type { Table } from '@tanstack/react-table'
 import { Eye, EyeOff, X } from 'lucide-react'
-import { useState, useCallback, useMemo } from 'react'
+import { useState, useEffect, useCallback, useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { Button } from '@/components/ui/button'
@@ -113,25 +113,65 @@ interface CommonLogsFilterBarProps<TData> {
 function UsageLogsRetentionNotice() {
   const { t } = useTranslation()
   const [visible, setVisible] = useState(true)
+  const [noticeIndex, setNoticeIndex] = useState(0)
+
+  useEffect(() => {
+    if (!visible) return
+    const timer = window.setInterval(() => {
+      setNoticeIndex((current) => (current + 1) % 2)
+    }, 6000)
+    return () => window.clearInterval(timer)
+  }, [visible])
 
   if (!visible) return null
 
   return (
     <div className='relative rounded-lg border border-amber-300/70 bg-amber-50/90 px-3 py-2.5 pr-10 text-sm leading-6 text-amber-950 shadow-xs dark:border-amber-400/30 dark:bg-amber-500/10 dark:text-amber-100'>
-      <span>
-        {t(
-          'Only usage records from the last 1-2 weeks are displayed. Please keep your own full log archive. If you have other questions, please contact'
+      <div aria-live='polite' className='min-h-6'>
+        {noticeIndex === 0 ? (
+          <>
+            <span>
+              {t(
+                'Only usage records from the last 1-2 weeks are displayed. Please keep your own full log archive. If you have other questions, please contact'
+              )}
+            </span>
+            <span>{t('Usage logs retention notice separator')}</span>
+            <WeChatSupportPopover
+              unstyled
+              className='font-semibold text-amber-900 underline decoration-amber-500/60 underline-offset-4 transition-colors hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-200'
+              contentClassName='border border-amber-200 bg-white shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'
+            >
+              {t('WeChat support')}
+            </WeChatSupportPopover>
+            <span>{t('Usage logs retention notice suffix')}</span>
+          </>
+        ) : (
+          <>
+            <span>
+              {t('Please include your username when consulting support.')}
+            </span>{' '}
+            <WeChatSupportPopover
+              unstyled
+              className='font-semibold text-amber-900 underline decoration-amber-500/60 underline-offset-4 transition-colors hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-200'
+              contentClassName='border border-amber-200 bg-white shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'
+            >
+              {t('WeChat support')}
+            </WeChatSupportPopover>
+          </>
         )}
-      </span>
-      <span>{t('Usage logs retention notice separator')}</span>
-      <WeChatSupportPopover
-        unstyled
-        className='font-semibold text-amber-900 underline decoration-amber-500/60 underline-offset-4 transition-colors hover:text-amber-700 dark:text-amber-100 dark:hover:text-amber-200'
-        contentClassName='border border-amber-200 bg-white shadow-lg dark:border-amber-300/20 dark:bg-neutral-950'
-      >
-        {t('WeChat support')}
-      </WeChatSupportPopover>
-      <span>{t('Usage logs retention notice suffix')}</span>
+      </div>
+      <div className='mt-1 flex gap-1' aria-hidden='true'>
+        {[0, 1].map((index) => (
+          <span
+            key={index}
+            className={
+              index === noticeIndex
+                ? 'h-1 w-4 rounded-full bg-amber-700/70'
+                : 'h-1 w-1 rounded-full bg-amber-500/40'
+            }
+          />
+        ))}
+      </div>
       <Button
         type='button'
         variant='ghost'

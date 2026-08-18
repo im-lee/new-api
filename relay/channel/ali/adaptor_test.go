@@ -9,6 +9,7 @@ import (
 	"testing"
 
 	"github.com/QuantumNous/new-api/common"
+	rootconstant "github.com/QuantumNous/new-api/constant"
 	relaycommon "github.com/QuantumNous/new-api/relay/common"
 	"github.com/QuantumNous/new-api/relay/constant"
 	relayhelper "github.com/QuantumNous/new-api/relay/helper"
@@ -30,6 +31,30 @@ func TestBuildAliDeepseekStreamInspectionRetryErrorFromSSE(t *testing.T) {
 	restored, readErr := io.ReadAll(resp.Body)
 	require.NoError(t, readErr)
 	assert.Equal(t, body, string(restored))
+}
+
+func TestBuildAliDeepseekStreamInspectionRetriesOtherEmbeddedErrors(t *testing.T) {
+	body := "data: {\"error\":{\"message\":\"upstream rejected content\",\"type\":\"invalid_request_error\",\"code\":\"content_filter\"}}\n\n"
+	resp := &http.Response{Body: io.NopCloser(bytes.NewBufferString(body))}
+
+	err := buildAliDeepseekStreamInspectionRetryErrorFromSSE(resp)
+	require.NotNil(t, err)
+	assert.Equal(t, http.StatusServiceUnavailable, err.StatusCode)
+}
+
+func TestAliDeepseekStreamInspectionRetryCandidate(t *testing.T) {
+	resp := &http.Response{StatusCode: http.StatusOK}
+	info := &relaycommon.RelayInfo{
+		IsStream:        true,
+		OriginModelName: "deepseek-v3",
+		ChannelMeta: &relaycommon.ChannelMeta{
+			ChannelType: rootconstant.ChannelTypeAli,
+		},
+	}
+
+	assert.True(t, isAliDeepseekStreamInspectionRetryCandidate(info, resp))
+	info.ChannelMeta.ChannelType = rootconstant.ChannelTypeOpenAI
+	assert.False(t, isAliDeepseekStreamInspectionRetryCandidate(info, resp))
 }
 
 func TestBuildAliDeepseekStreamInspectionPreservesSuccessfulSSE(t *testing.T) {

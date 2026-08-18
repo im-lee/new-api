@@ -19,7 +19,11 @@ For commercial licensing, please contact support@quantumnous.com
 import { describe, expect, test } from 'vitest'
 
 import type { Channel } from '../../types'
-import { getChannelTableRowId, type TagRow } from '../channel-utils'
+import {
+  aggregateChannelsByTag,
+  getChannelTableRowId,
+  type TagRow,
+} from '../channel-utils'
 
 function channel(id: number): Channel {
   return { id } as Channel
@@ -47,5 +51,28 @@ describe('channel table row identity', () => {
 
     expect(getChannelTableRowId(tagRow)).toBe('tag:202')
     expect(getChannelTableRowId(channel(202))).toBe('channel:202')
+  })
+
+  test('aggregates used quota and remaining balance for tag rows', () => {
+    const rows = aggregateChannelsByTag([
+      {
+        id: 1,
+        tag: 'ali',
+        group: '',
+        used_quota: 100,
+        balance: 12.5,
+      } as Channel,
+      {
+        id: 2,
+        tag: 'ali',
+        group: '',
+        used_quota: 250,
+        balance: 7.25,
+      } as Channel,
+    ])
+
+    const tagRow = rows[0] as TagRow
+    expect(tagRow.used_quota).toBe(350)
+    expect(tagRow.balance).toBe(19.75)
   })
 })

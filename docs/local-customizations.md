@@ -11,6 +11,29 @@ This file records local product customizations that must be preserved when mergi
 
 ## Entries
 
+### 2026-08-18 — Post-Merge Customization Audit And Regression Recovery
+
+**Behavior to preserve:** Channel tag rows display both cumulative used quota and cumulative remaining balance. Ali/DashScope channels return an explicit provider-specific balance-query explanation instead of the generic “not implemented” error. Usage logs rotate two dismissible customer notices. Model Square name sorting is numeric/version-aware with newer versions first, while group multiplier details stay hidden. Ali DeepSeek HTTP-200 SSE embedded errors remain converted to retryable 503 errors. The wallet email-binding action continues to open `https://api.silra.cn/profile`.
+
+**Affected files:**
+
+- `controller/channel-billing.go`
+- `relay/channel/ali/adaptor.go`
+- `relay/channel/ali/adaptor_test.go`
+- `web/src/features/channels/components/channels-columns.tsx`
+- `web/src/features/channels/lib/channel-utils.ts`
+- `web/src/features/channels/lib/__tests__/channel-table-row-id.test.ts`
+- `web/src/features/pricing/lib/filters.ts`
+- `web/src/features/pricing/lib/__tests__/filters.test.ts`
+- `web/src/features/pricing/components/pricing-sidebar.tsx`
+- `web/src/features/usage-logs/components/common-logs-filter-bar.tsx`
+- `web/src/features/usage-logs/components/usage-logs-mobile-card.tsx`
+- `web/src/features/wallet/index.tsx`
+
+**Upstream merge notes:** Do not restore the tag-row special case that hides remaining balance. Preserve numeric collation rather than plain lexical model-name sorting. Keep Ali stream inspection bounded to the initial SSE chunks and restore the response body after inspection. Keep both usage-log notices and their local close control when the log toolbar is refactored.
+
+**Validation:** `cd web && bun run test && bun run build:check`; `go test ./controller ./relay/channel/ali`.
+
 ### 2026-08-18 — Upstream Frontend Flattening And Classic Retirement
 
 **Behavior to preserve:** Follow upstream's single-theme layout: the former `web/default` application now lives directly under `web/`, and the retired `web/classic` theme remains deleted. Every local product behavior previously implemented only in Classic must be carried into the current frontend instead of restoring Classic.

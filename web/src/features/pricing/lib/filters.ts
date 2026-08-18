@@ -105,6 +105,28 @@ function getModelPrice(model: PricingModel): number {
   return model.quota_type === 0 ? model.model_ratio : model.model_price || 0
 }
 
+const modelVersionCollator = new Intl.Collator(undefined, {
+  numeric: true,
+  sensitivity: 'base',
+})
+
+/** Sort model names naturally, keeping newer numeric versions first. */
+export function compareModelNamesByVersion(
+  leftName: string,
+  rightName: string
+): number {
+  const leftVersionStart = leftName.search(/\d/)
+  const rightVersionStart = rightName.search(/\d/)
+  const leftFamily =
+    leftVersionStart === -1 ? leftName : leftName.slice(0, leftVersionStart)
+  const rightFamily =
+    rightVersionStart === -1 ? rightName : rightName.slice(0, rightVersionStart)
+  const familyOrder = modelVersionCollator.compare(leftFamily, rightFamily)
+
+  if (familyOrder !== 0) return familyOrder
+  return modelVersionCollator.compare(rightName, leftName)
+}
+
 /**
  * Sort models by specified option
  */
@@ -117,7 +139,7 @@ export function sortModels(
   switch (sortBy) {
     case SORT_OPTIONS.NAME:
       sorted.sort((a, b) =>
-        (a.model_name || '').localeCompare(b.model_name || '')
+        compareModelNamesByVersion(a.model_name || '', b.model_name || '')
       )
       break
     case SORT_OPTIONS.PRICE_LOW:

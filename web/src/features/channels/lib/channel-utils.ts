@@ -677,6 +677,10 @@ export function aggregateChannelsByTag(
     // Aggregate used_quota (sum)
     tagRow.used_quota += channel.used_quota
 
+    // Aggregate remaining balance (sum) so tag rows keep the same balance
+    // visibility as regular channel rows.
+    tagRow.balance += channel.balance || 0
+
     // Aggregate response_time (average)
     tagRow.response_time =
       (tagRow.response_time * (childCount - 1) + channel.response_time) /

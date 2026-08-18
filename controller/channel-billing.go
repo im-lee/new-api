@@ -474,6 +474,8 @@ func updateStandardChannelBalance(channel *model.Channel) (float64, error) {
 		}
 	case constant.ChannelTypeAzure:
 		return 0, errors.New("尚未实现")
+	case constant.ChannelTypeAli:
+		return 0, errors.New("阿里云百炼不支持通过 API Key 查询账户余额，请前往阿里云控制台查看")
 	case constant.ChannelTypeCustom:
 		baseURL = channel.GetBaseURL()
 	//case common.ChannelTypeOpenAISB:

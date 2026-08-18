@@ -16,7 +16,6 @@ along with this program. If not, see <https://www.gnu.org/licenses/>.
 
 For commercial licensing, please contact support@quantumnous.com
 */
-import { useNavigate } from '@tanstack/react-router'
 import { useState, useEffect, useCallback, useMemo, useRef } from 'react'
 import { useTranslation } from 'react-i18next'
 
@@ -71,11 +70,11 @@ interface WalletProps {
 }
 
 const EMAIL_BIND_REMINDER_THRESHOLD = 10
+const EMAIL_BIND_PROFILE_URL = 'https://api.silra.cn/profile'
 const SHOW_AFFILIATE_REWARDS_CARD = false
 
 export function Wallet(props: WalletProps) {
   const { t } = useTranslation()
-  const navigate = useNavigate()
   const [user, setUser] = useState<UserWalletData | null>(null)
   const [userLoading, setUserLoading] = useState(true)
   const [topupAmount, setTopupAmount] = useState(0)
@@ -446,7 +445,11 @@ export function Wallet(props: WalletProps) {
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel>{t('Maybe later')}</AlertDialogCancel>
-            <AlertDialogAction onClick={() => navigate({ to: '/profile' })}>
+            <AlertDialogAction
+              onClick={() => {
+                window.location.href = EMAIL_BIND_PROFILE_URL
+              }}
+            >
               {t('Bind email')}
             </AlertDialogAction>
           </AlertDialogFooter>
